@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardCornerRadius="0dp"
+    app:cardBackgroundColor="@color/back_secondary">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingVertical="15dp"
+        android:paddingHorizontal="20dp">
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/checkbox_done"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            app:checkedState="unchecked"
+            android:theme="@style/ThemeOverlay.App.CheckBox"
+            app:layout_constraintBottom_toBottomOf="@+id/ll_msg"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/ll_msg" />
+
+        <LinearLayout
+            android:id="@+id/ll_msg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="35dp"
+            android:layout_marginEnd="35dp"
+            app:layout_constraintEnd_toStartOf="@+id/iv_info"
+            app:layout_constraintStart_toEndOf="@+id/checkbox_done"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/iv_priority"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="5dp"
+                android:src="@drawable/ic_low_priority"
+                tools:ignore="ContentDescription" />
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_msg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="3"
+                android:text="@string/add_new_todo"
+                android:ellipsize="end"
+                android:fontFamily="@font/roboto_regular"
+                android:textColor="@color/label_primary"
+                android:textSize="16sp" />
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/iv_info"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_info"
+            app:layout_constraintBottom_toBottomOf="@+id/ll_msg"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/ll_msg"
+            app:tint="@color/label_tertiary"
+            tools:ignore="ContentDescription" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_date"
+            android:visibility="visible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="35dp"
+            android:layout_marginEnd="35dp"
+            android:layout_marginTop="5dp"
+            android:maxLines="3"
+            android:text="@string/date"
+            android:textColor="@color/label_tertiary"
+            android:fontFamily="@font/roboto_regular"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toStartOf="@+id/iv_info"
+            app:layout_constraintStart_toEndOf="@+id/checkbox_done"
+            app:layout_constraintTop_toBottomOf="@+id/ll_msg" />
+
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">ToDo App</string>
+    <string name="add_new_todo_description">Добавить новую задачу</string>
+    <string name="add_new_todo">Новое</string>
+    <string name="my_todo">Мои дела</string>
+    <string name="todo_done">Выполнено - %1$d</string>
+    <string name="date">%1$d.%2$d.%3$d</string>
+    <string name="back">back</string>
+    <string name="save">Сохранить</string>
+    <string name="msg_hint">Что надо сделать…</string>
+    <string name="priority_title">Важность</string>
+    <string name="low_priority">Нет</string>
+    <string name="deadline_title">Сделать до</string>
+    <string name="delete">Удалить</string>
+</resources>
