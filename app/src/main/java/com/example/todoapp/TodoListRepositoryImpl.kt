@@ -1,75 +1,62 @@
 package com.example.todoapp
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
+import com.example.todoapp.localbase.TodoItemDao
+import com.example.todoapp.localbase.toDbModel
+import com.example.todoapp.localbase.toListOfToDoEntyty
+import com.example.todoapp.retrofit.ItemPriority
 import com.example.todoapp.retrofit.TodoItem
-import com.example.todoapp.retrofit.TodoListRepository
-import java.util.Calendar
+import kotlinx.coroutines.flow.*
+import java.util.*
 
-object TodoListRepositoryImpl : TodoListRepository {
+class TodoListRepositoryImpl(private val dao: TodoItemDao) : TodoListRepository {
 
-    private val todoList = mutableListOf<TodoItem>()
-    private val todoListLiveData = MutableLiveData<List<TodoItem>>()
+    init{
+        var count: Int = 1
+        count=count+1
+        Log.d("countReposit", "((")
 
-    init {
-        todoList.add(
-            TodoItem(
-                "0",
-                "Доделать домашку по алгосам",
-                TodoItem.ItemPriority.LOW,
-                isCompleted = false,
-                createDate = Calendar.getInstance().time,
-                deadline = null,
-                changedDate = null
-            )
-        )
-
-        todoList.add(
-            TodoItem(
-                "10",
-                "Устроить гос переворот в Восточном Тиморе",
-                TodoItem.ItemPriority.URGENT,
-                isCompleted = false,
-                createDate = Calendar.getInstance().time,
-                deadline = null,
-                changedDate = null
-            )
-        )
-
-        updateTodoList()
     }
 
-    override fun getTodoList(): LiveData<List<TodoItem>> {
-        return todoListLiveData
+     override fun getTodoList(): Flow<List<TodoItem>> {
+         val toDoItemList = dao.getTodoListFlow()
+
+         val convertedToDoItemList = toDoItemList.map {
+        println("DEBAG2 +${it.size}")
+             it.toListOfToDoEntyty() }
+
+        return convertedToDoItemList
     }
 
-    override fun getTodoItem(id: String): TodoItem {
-        return todoList.find { it.id == id } ?: throw RuntimeException("not found")
+    override suspend fun getTodoItem(id: String): TodoItem {
+       // return todoList.find { it.id == id } ?: throw RuntimeException("not found")
+        return TodoItem("","",ItemPriority.LOW,null,true, Calendar.getInstance().time,null)
     }
 
-    override fun editTodoItem(item: TodoItem) {
-        val oldElement = todoList.find { it.id == item.id }
+    override suspend fun editTodoItem(item: TodoItem) {
+       /* val oldElement = todoList.find { it.id == item.id }
         val index = todoList.indexOf(oldElement)
 
         todoList[index] = item
 
-        updateTodoList()
+        updateTodoList()*/
     }
 
-    override fun addTodoItem(item: TodoItem) {
-        todoList.add(item)
-
-        updateTodoList()
+    override suspend fun addTodoItem(item: TodoItem) {
+        Log.d("TodoListRepositoryImpl", "addTodoItem: insertion")
+        dao.insertTodoItem( item.toDbModel())
     }
 
-    override fun deleteTodoItem(item: TodoItem) {
-        todoList.remove(item)
+    override suspend fun deleteTodoItem(item: TodoItem) {
+      /*  todoList.remove(item)
 
-        updateTodoList()
+        updateTodoList()*/
     }
 
 
-    private fun updateTodoList() {
-        todoListLiveData.value = todoList.toList()
-    }
+
+
+
+
+
 }

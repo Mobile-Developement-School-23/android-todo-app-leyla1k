@@ -8,22 +8,34 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialSharedAxis
 import com.example.todoapp.databinding.FragmentTodoBinding
+import com.example.todoapp.localbase.MainDb
+import com.example.todoapp.localbase.ViewModelFactory
+import com.example.todoapp.retrofit.ItemPriority
 import com.example.todoapp.retrofit.TodoItem
+import kotlinx.coroutines.*
 import java.util.*
 
 class AddTodoFragment : Fragment() {
 
     private lateinit var binding: FragmentTodoBinding
-    private lateinit var viewModel : MainViewModel
-    private lateinit var todoItem : TodoItem
 
+    private lateinit var todoItem: TodoItem
+
+    //private lateinit var todoListRepository:
     private var priorityMenu: PopupMenu? = null
     private val c = Calendar.getInstance()
+
+
+
+    private val viewModel: MainViewModel by activityViewModels ()
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,22 +46,16 @@ class AddTodoFragment : Fragment() {
         returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
 
         binding = FragmentTodoBinding.inflate(inflater, container, false)
-        viewModel = ViewModelProvider(requireActivity()) [MainViewModel::class.java]
-
-        init()
-        setupListeners()
 
 
-        return binding.root
-    }
 
-    private fun init(){
-        with(binding){
+
+        with(binding) {
 
             todoItem = TodoItem(
                 id = c.timeInMillis.toString(),
                 msg = "",
-                priority = TodoItem.ItemPriority.NORMAL,
+                priority = ItemPriority.NORMAL,
                 deadline = null,
                 isCompleted = false,
                 createDate = Calendar.getInstance().time,
@@ -70,10 +76,16 @@ class AddTodoFragment : Fragment() {
 
         }
 
+
+        setupListeners()
+
+
+        return binding.root
     }
 
-    private fun setupListeners(){
-        with(binding){
+
+    private fun setupListeners() {
+        with(binding) {
             ivBack.setOnClickListener {
                 findNavController().popBackStack()
             }
@@ -83,10 +95,10 @@ class AddTodoFragment : Fragment() {
             }
 
             switchDeadline.setOnClickListener {
-                if (switchDeadline.isChecked){
+                if (switchDeadline.isChecked) {
                     tvDeadline.visibility = View.VISIBLE
                     todoItem.deadline = Calendar.getInstance().time
-                }else{
+                } else {
                     tvDeadline.visibility = View.INVISIBLE
                     todoItem.deadline = null
                 }
@@ -98,9 +110,14 @@ class AddTodoFragment : Fragment() {
 
             btnSave.setOnClickListener {
                 todoItem.msg = tvMsg.text.toString()
-
                 if (todoItem.msg.isNotBlank()) {
-                    viewModel.addTodoItem(todoItem)
+///////////////////////////////////////
+
+                           viewModel.addTodoItem(todoItem)
+
+//////////////////////////////////////
+
+
                     findNavController().popBackStack()
                 } else {
                     val decorView = requireActivity().window.decorView
@@ -113,6 +130,8 @@ class AddTodoFragment : Fragment() {
 
                 }
             }
+
+
         }
     }
 
@@ -138,28 +157,28 @@ class AddTodoFragment : Fragment() {
         datePickerDialog.show()
     }
 
-    private fun setupMenu(){
+    private fun setupMenu() {
         priorityMenu = PopupMenu(requireContext(), binding.tvPriority)
 
         priorityMenu!!.menuInflater.inflate(R.menu.menu_priority, priorityMenu!!.menu)
 
         // Хардкодить плохо, но я разбойник
         priorityMenu!!.setOnMenuItemClickListener { item ->
-            when(item.itemId){
+            when (item.itemId) {
                 R.id.low -> {
                     binding.tvPriority.setTextColor(requireActivity().getColor(R.color.label_tertiary))
                     binding.tvPriority.text = "Низкий"
-                    todoItem.priority = TodoItem.ItemPriority.LOW
+                    todoItem.priority = ItemPriority.LOW
                 }
                 R.id.normal -> {
                     binding.tvPriority.setTextColor(requireActivity().getColor(R.color.label_tertiary))
                     binding.tvPriority.text = "Нет"
-                    todoItem.priority = TodoItem.ItemPriority.NORMAL
+                    todoItem.priority = ItemPriority.NORMAL
                 }
                 else -> {
                     binding.tvPriority.setTextColor(requireActivity().getColor(R.color.red))
                     binding.tvPriority.text = "!! Высокий"
-                    todoItem.priority = TodoItem.ItemPriority.URGENT
+                    todoItem.priority = ItemPriority.URGENT
                 }
             }
             return@setOnMenuItemClickListener true

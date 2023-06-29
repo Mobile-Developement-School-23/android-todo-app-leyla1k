@@ -1,53 +1,117 @@
 package com.example.todoapp
 
-import androidx.lifecycle.ViewModel
+import android.util.Log
+import androidx.lifecycle.*
+import com.example.todoapp.domain.*
 import com.example.todoapp.retrofit.TodoItem
-import com.example.todoapp.retrofit.TodoListRepository
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import java.util.*
 
-class MainViewModel : ViewModel() {
+class MainViewModel(private val todoListRepository: TodoListRepository) : ViewModel() {
 
+    private val _listOfNotesFlow = MutableStateFlow<List<TodoItem>>(emptyList())
+    val listOfNotesFlow: StateFlow<List<TodoItem>> = _listOfNotesFlow.asStateFlow()
+    private lateinit var getListJob: Job
 
-    val retrofit = Retrofit.Builder().baseUrl("https://beta.mrdekk.ru/todobackend")
-        .addConverterFactory(GsonConverterFactory.create()).build()
-    val todoListRepository = retrofit.create(TodoListRepository::class.java)
-
-
-   // private val repository = TodoListRepositoryImpl
-
-    private val repository = todoListRepository.getTodoList()
-
-
-    private val getTodoListUseCase = GetTodoListUseCase(repository)
-    private val getTodoItemUseCase = GetTodoItemUseCase(repository)
-    private val editTodoItemUseCase = EditTodoItemUseCase(repository)
-    private val addTodoItemUseCase = AddTodoItemUseCase(repository)
-    private val deleteTodoItemUseCase = DeleteTodoItemUseCase(repository)
-
-    val todoList = getTodoListUseCase.getTodoList()
+    //var todoListLiveData = MutableLiveData<List<TodoItem>>()
+    /* val todoListLiveData : MutableLiveData<List<TodoItem>> by lazy{
+        MutableLiveData<List<TodoItem>>()
+    }*/
 
 
-    fun getTodoItem(id: String) : TodoItem {
+    /*private*/ //var todoList: List<TodoItem> =  mutableListOf<TodoItem>()
+
+/*    val someData: LiveData<Boolean>
+        get() = todoListLiveData*/
+
+
+    //val todoList = getTodoListUseCase.getTodoList()
+
+    init {
+        getListOfNotes()
+        Log.d("DEBAG1","Creation vm")
+
+        viewModelScope.launch(Dispatchers.IO)
+        {
+
+                getListOfNotes()
+
+                listOfNotesFlow.collect {
+                    Log.d("DEBAG4", "listOfNotesFlow" + it.size.toString())
+                }
+        }
+
+    }
+
+    private fun getListOfNotes() {
+        getListJob = viewModelScope.launch {
+            (todoListRepository.getTodoList()).collect { uit ->
+                _listOfNotesFlow.update {
+                    mutableListOf<TodoItem>().apply {
+                        addAll(uit.map { noteData ->
+                            noteData.copy()
+                        })
+
+                    }
+
+                }
+              _listOfNotesFlow.collect {
+                    Log.d("DEBAG111", it.size.toString())
+                }
+            }
+        }
+    }
+
+    suspend fun <T> Flow<List<T>>.flattenToList() =
+        flatMapConcat { it.asFlow() }.toList()
+
+    suspend fun getToDoListFromFlow(todoListFlow: Flow<List<TodoItem>>): List<TodoItem> {//переименовать!
+        return todoListFlow.flattenToList()
+    }
+
+
+    /*suspend fun updateTodoList() {///
+        todoListLiveData.postValue(todoList )
+
+        Log.d("updateTodoList", "inFun")
+        Log.d("updateTodoList", todoListLiveData.value.toString()+ " =livedata")
+
+    }*/
+
+    /*fun getTodoItem(id: String): TodoItem {
         return getTodoItemUseCase.getTodoItem(id)
-    }
+    }*/
 
-    fun editTodoItem(item: TodoItem) {
-        editTodoItemUseCase.editTodoItem(item)
-    }
+    /* fun editTodoItem(item: TodoItem) {
+         editTodoItemUseCase.editTodoItem(item)
+     }*/
 
-    fun addTodoItem(item: TodoItem) {
+    /*fun addTodoItem(item: TodoItem) {
         addTodoItemUseCase.addTodoItem(item)
+    }*/
+
+
+     fun addTodoItem(item: TodoItem) {
+
+        viewModelScope.launch(Dispatchers.IO) {
+            getListOfNotes()
+            println("DEBAG2 + added into rep")
+            todoListRepository.addTodoItem(item)
+        }
     }
 
-    fun changeDoneState(item: TodoItem){
-        val newItem = item.copy(isCompleted = ! item.isCompleted)
-        editTodoItemUseCase.editTodoItem(newItem)
-    }
 
-    fun deleteTodoItem(todoItem: TodoItem){
-        deleteTodoItemUseCase.deleteTodoItem(todoItem)
-    }
+    /*   fun changeDoneState(item: TodoItem) {
+           val newItem = item.copy(isCompleted = !item.isCompleted)
+           editTodoItemUseCase.editTodoItem(newItem)
+       }
 
+       fun deleteTodoItem(todoItem: TodoItem) {
+           deleteTodoItemUseCase.deleteTodoItem(todoItem)
+       }
+   */
 
 }

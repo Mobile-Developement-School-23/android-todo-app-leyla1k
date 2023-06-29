@@ -1,28 +1,59 @@
 package com.example.todoapp
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.transition.MaterialSharedAxis
 import com.tsuryo.swipeablerv.SwipeLeftRightCallback
 import com.example.todoapp.databinding.FragmentMainBinding
+import com.example.todoapp.localbase.TodoItemDao
+import com.example.todoapp.localbase.MainDb
+import com.example.todoapp.localbase.ViewModelFactory
+import kotlinx.coroutines.launch
 
 class MainFragment : Fragment() {
 
     private lateinit var binding: FragmentMainBinding
-    private lateinit var viewModel: MainViewModel
+
+
 
     private val todoListAdapter = TodoListAdapter()
 
-    companion object{
+    val viewModel: MainViewModel by activityViewModels {
+        ViewModelFactory((requireActivity().application as TodoApplication).todoListRepositoryImpl)
+
+    }
+
+    companion object {
         var countDone = MutableLiveData(0)
     }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        Log.d("Attach", "onAttach: ")
+
+    }
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.d("createee", "onCreate: ")
+
+    }
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,19 +65,11 @@ class MainFragment : Fragment() {
 
         binding = FragmentMainBinding.inflate(inflater, container, false)
 
-        viewModel = ViewModelProvider(requireActivity()) [MainViewModel::class.java]
+        Log.d("StartsAgain", "onCreateView: ")
 
-        viewModel.todoList.observe(viewLifecycleOwner) { it ->
-            var count = 0
 
-            it.forEach {
-                 if (it.isCompleted)
-                     count += 1
-            }
 
-            countDone.value = count
-            todoListAdapter.submitList(it)
-        }
+
 
         countDone.observe(viewLifecycleOwner) {
             binding.tvDone.text = getString(R.string.todo_done, it ?: 0)
@@ -64,24 +87,48 @@ class MainFragment : Fragment() {
             )
         }
 
-        setupRecyclerView()
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.listOfNotesFlow.flowWithLifecycle(
+                viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED
+            ).collect { dataFromDB ->
+                todoListAdapter.submit(dataFromDB)
+                Log.d("DEBAG4", "data" + dataFromDB.size)
+            }
+        }
+        setupRecyclerView()
         return binding.root
     }
 
-    private fun setupRecyclerView(){
 
-        with(binding.rvMain){
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("destroy", "destroy: ")
+
+    }
+
+    private fun setupRecyclerView() {
+
+        with(binding.rvMain) {
             adapter = todoListAdapter
             layoutManager = LinearLayoutManager(requireContext())
 
-            setListener(object :  SwipeLeftRightCallback.Listener {
+            setListener(object : SwipeLeftRightCallback.Listener {
                 override fun onSwipedRight(position: Int) {
-                    viewModel.changeDoneState(todoListAdapter.currentList[position])
+                    //  viewModel.changeDoneState(todoListAdapter.currentList[position])
                 }
 
                 override fun onSwipedLeft(position: Int) {
-                    viewModel.deleteTodoItem(todoListAdapter.currentList[position])
+                    // viewModel.deleteTodoItem(todoListAdapter.currentList[position])
                 }
             })
 

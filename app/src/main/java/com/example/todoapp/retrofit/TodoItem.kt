@@ -1,6 +1,9 @@
 package com.example.todoapp.retrofit
 
+
 import java.util.*
+
+
 
 data class TodoItem(
     val id: String,
@@ -10,10 +13,10 @@ data class TodoItem(
     var isCompleted: Boolean,
     val createDate: Date,
     var changedDate: Date?
-)  {
-    enum class ItemPriority {
-        URGENT,
-        NORMAL,
-        LOW
+)
+
+    enum class ItemPriority(val value: Int) {
+        URGENT(0),
+        NORMAL(1),
+        LOW(2)
     }
-}

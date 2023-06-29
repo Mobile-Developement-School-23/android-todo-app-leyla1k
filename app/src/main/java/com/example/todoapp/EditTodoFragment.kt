@@ -14,6 +14,7 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialSharedAxis
 import com.example.todoapp.databinding.FragmentTodoBinding
+import com.example.todoapp.retrofit.ItemPriority
 import com.example.todoapp.retrofit.TodoItem
 import java.util.*
 
@@ -38,7 +39,7 @@ class EditTodoFragment : Fragment() {
         binding = FragmentTodoBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(requireActivity()) [MainViewModel::class.java]
 
-        todoItem = viewModel.getTodoItem(todoId)
+        //todoItem = viewModel.getTodoItem(todoId)
 
         init()
         setupMenu()
@@ -53,11 +54,11 @@ class EditTodoFragment : Fragment() {
             tvMsg.setText(todoItem.msg)
 
             when(todoItem.priority){
-                TodoItem.ItemPriority.LOW -> {
+                ItemPriority.LOW -> {
                     binding.tvPriority.setTextColor(requireActivity().getColor(R.color.label_tertiary))
                     binding.tvPriority.text = "Низкий"
                 }
-                TodoItem.ItemPriority.URGENT -> {
+                ItemPriority.URGENT -> {
                     binding.tvPriority.setTextColor(requireActivity().getColor(R.color.red))
                     binding.tvPriority.text = "!! Высокий"
                 }
@@ -116,7 +117,7 @@ class EditTodoFragment : Fragment() {
 
                 if (todoItem.msg.isNotBlank()) {
                     todoItem.changedDate = Calendar.getInstance().time
-                    viewModel.editTodoItem(todoItem)
+                   // viewModel.editTodoItem(todoItem)
                     findNavController().popBackStack()
                 } else {
                     val decorView = requireActivity().window.decorView
@@ -131,7 +132,7 @@ class EditTodoFragment : Fragment() {
 
 
             llDelete.setOnClickListener {
-                viewModel.deleteTodoItem(todoItem)
+               // viewModel.deleteTodoItem(todoItem)
                 findNavController().popBackStack()
             }
 
@@ -157,17 +158,17 @@ class EditTodoFragment : Fragment() {
             R.id.low -> {
                 binding.tvPriority.setTextColor(requireActivity().getColor(R.color.label_tertiary))
                 binding.tvPriority.text = "Низкий"
-                todoItem.priority = TodoItem.ItemPriority.LOW
+                todoItem.priority = ItemPriority.LOW
             }
             R.id.normal -> {
                 binding.tvPriority.setTextColor(requireActivity().getColor(R.color.label_tertiary))
                 binding.tvPriority.text = "Нет"
-                todoItem.priority = TodoItem.ItemPriority.NORMAL
+                todoItem.priority = ItemPriority.NORMAL
             }
             else -> {
                 binding.tvPriority.setTextColor(requireActivity().getColor(R.color.red))
                 binding.tvPriority.text = "!! Высокий"
-                todoItem.priority = TodoItem.ItemPriority.URGENT
+                todoItem.priority = ItemPriority.URGENT
             }
         }
     }

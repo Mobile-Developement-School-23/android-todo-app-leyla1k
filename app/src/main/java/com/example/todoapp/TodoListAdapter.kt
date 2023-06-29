@@ -2,6 +2,7 @@ package com.example.todoapp
 
 import android.content.res.Resources
 import android.graphics.Paint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,10 +11,20 @@ import androidx.recyclerview.widget.ListAdapter
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.textview.MaterialTextView
 import com.example.todoapp.databinding.ItemTodoBinding
+import com.example.todoapp.retrofit.ItemPriority
 import com.example.todoapp.retrofit.TodoItem
 import java.util.*
 
 class TodoListAdapter : ListAdapter<TodoItem, TodoItemViewHolder>(TodoItemDiffCallback()) {
+
+    fun submit(list:  List<TodoItem>) {
+
+        for( i in list){
+            println(i)
+        }
+        Log.d("DEBAG3", list.size.toString())
+        submitList(list)
+    }
 
     var onTodoItemClickListener: ((TodoItem) -> Unit)? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoItemViewHolder {
@@ -33,7 +44,7 @@ class TodoListAdapter : ListAdapter<TodoItem, TodoItemViewHolder>(TodoItemDiffCa
             tvMsg.text = item.msg  // Текст туду
 
             when (item.priority) { // Текст приоритета
-                TodoItem.ItemPriority.LOW -> {
+                ItemPriority.LOW -> {
                     ivPriority.setImageResource(R.drawable.ic_low_priority)
                     ivPriority.visibility = View.VISIBLE
 
@@ -41,14 +52,14 @@ class TodoListAdapter : ListAdapter<TodoItem, TodoItemViewHolder>(TodoItemDiffCa
                         checkboxDone.isErrorShown = false
                     }
                 }
-                TodoItem.ItemPriority.NORMAL -> {
+                ItemPriority.NORMAL -> {
                     ivPriority.visibility = View.GONE
                     if (!item.isCompleted){
                         checkboxDone.isErrorShown = false
                     }
                 }
 
-                TodoItem.ItemPriority.URGENT -> {
+                ItemPriority.URGENT -> {
                     ivPriority.setImageResource(R.drawable.ic_urgent_priority)
                     ivPriority.visibility = View.VISIBLE
                     if (!item.isCompleted){
@@ -110,7 +121,7 @@ class TodoListAdapter : ListAdapter<TodoItem, TodoItemViewHolder>(TodoItemDiffCa
     private fun setTodoNotCompleted(box: MaterialCheckBox, item: TodoItem, tv: MaterialTextView, resources: Resources){
         box.checkedState = MaterialCheckBox.STATE_UNCHECKED
 
-        box.isErrorShown = item.priority == TodoItem.ItemPriority.URGENT
+        box.isErrorShown = item.priority == ItemPriority.URGENT
 
         tv.setTextColor(
             ResourcesCompat.getColor(resources, R.color.label_primary, null)
