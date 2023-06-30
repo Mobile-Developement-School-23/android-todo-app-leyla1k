@@ -11,8 +11,6 @@ import androidx.recyclerview.widget.ListAdapter
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.textview.MaterialTextView
 import com.example.todoapp.databinding.ItemTodoBinding
-import com.example.todoapp.retrofit.ItemPriority
-import com.example.todoapp.retrofit.TodoItem
 import java.util.*
 
 class TodoListAdapter : ListAdapter<TodoItem, TodoItemViewHolder>(TodoItemDiffCallback()) {
@@ -97,7 +95,7 @@ class TodoListAdapter : ListAdapter<TodoItem, TodoItemViewHolder>(TodoItemDiffCa
                 checkboxDone.isErrorShown = false
                 if (checkboxDone.checkedState == MaterialCheckBox.STATE_CHECKED) {
                     setTodoCompeted(checkboxDone, tvMsg, root.resources)
-                    MainFragment.countDone.value = MainFragment.countDone.value?.plus(1) // Потом переделаю на вьюМодель
+                    MainFragment.countDone.value = MainFragment.countDone.value?.plus(1) // переделаю
                 }else{
                     MainFragment.countDone.value = MainFragment.countDone.value?.minus(1)
                     setTodoNotCompleted(checkboxDone, item, tvMsg, root.resources)

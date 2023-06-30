@@ -21,6 +21,8 @@ import com.example.todoapp.databinding.FragmentMainBinding
 import com.example.todoapp.localbase.TodoItemDao
 import com.example.todoapp.localbase.MainDb
 import com.example.todoapp.localbase.ViewModelFactory
+import com.example.todoapp.network.NetworkListener
+import com.example.todoapp.retrofit.todoApi
 import kotlinx.coroutines.launch
 import kotlin.math.log
 
@@ -28,18 +30,12 @@ class MainFragment : Fragment() {
 
     private lateinit var binding: FragmentMainBinding
 
-
-
     private val todoListAdapter = TodoListAdapter()
-
+   // private val networkListener: NetworkListener
     val viewModel: MainViewModel by activityViewModels {
         ViewModelFactory((requireActivity().application as TodoApplication).todoListRepositoryImpl)
-
     }
 
-    /*companion object {
-        var countDone = MutableLiveData(0)
-    }*/
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -66,27 +62,8 @@ class MainFragment : Fragment() {
 
         binding = FragmentMainBinding.inflate(inflater, container, false)
 
-        Log.d("StartsAgain", "onCreateView: ")
 
 
-
-
-///////////////теперь чебурекаемсяя с этим
-        /*countDone.observe(viewLifecycleOwner) {
-            binding.tvDone.text = getString(R.string.todo_done, it ?: 0)
-        }*/
- /////////////////////////// /  //  /  ///////////
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.countOfDoneFlow.flowWithLifecycle(
-                viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED).collect {
-                val str ="Выполнено - "+ viewModel.countOfDoneFlow.value.toString()
-                //binding.tvDone.text = getString(R.string.todo_done , it ?: 0)
-                Log.d("MainFragment", "str = " + str)
-                binding.tvDone.text = str
-            }
-        }
-////////////////////////
 
 
 
@@ -112,6 +89,22 @@ class MainFragment : Fragment() {
             }
         }
         setupRecyclerView()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.countOfDoneFlow.flowWithLifecycle(
+                viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED).collect {
+                val str ="Выполнено - "+ viewModel.countOfDoneFlow.value.toString()
+                //binding.tvDone.text = getString(R.string.todo_done , it ?: 0)
+                Log.d("MainFragment", "str = " + str)
+                binding.tvDone.text = str
+            }
+        }
+
+
+       // checkNetworkAvailability(context: Context)
+
+
+
         return binding.root
     }
 

@@ -9,17 +9,10 @@ import android.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialSharedAxis
 import com.example.todoapp.databinding.FragmentTodoBinding
-import com.example.todoapp.localbase.MainDb
-import com.example.todoapp.localbase.ViewModelFactory
-import com.example.todoapp.retrofit.ItemPriority
-import com.example.todoapp.retrofit.TodoItem
-import kotlinx.coroutines.*
 import java.util.*
 
 class AddTodoFragment : Fragment() {

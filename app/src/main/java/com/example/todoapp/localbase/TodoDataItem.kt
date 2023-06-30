@@ -3,7 +3,7 @@ package com.example.todoapp.localbase
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.todoapp.retrofit.ItemPriority
+import com.example.todoapp.ItemPriority
 import java.util.*
 
 

@@ -14,8 +14,6 @@ import androidx.navigation.fragment.navArgs
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialSharedAxis
 import com.example.todoapp.databinding.FragmentTodoBinding
-import com.example.todoapp.retrofit.ItemPriority
-import com.example.todoapp.retrofit.TodoItem
 import java.util.*
 
 class EditTodoFragment : Fragment() {

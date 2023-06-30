@@ -1,7 +1,5 @@
 package com.example.todoapp
 
-import androidx.lifecycle.LiveData
-import com.example.todoapp.retrofit.TodoItem
 import kotlinx.coroutines.flow.Flow
 
 
@@ -15,8 +13,10 @@ interface TodoListRepository {
 
     suspend fun addTodoItem(item: TodoItem)
 
-    suspend fun deleteTodoItem(item: TodoItem,stringId:String)
+    suspend fun deleteTodoItem(item: TodoItem, stringId:String)
+
     suspend fun deleteTodoItemWithoutPosition(item: TodoItem)
 
+    suspend fun updateTodoList()
 
 }

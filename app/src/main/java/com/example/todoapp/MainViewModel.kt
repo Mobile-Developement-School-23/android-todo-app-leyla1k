@@ -2,14 +2,11 @@ package com.example.todoapp
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.example.todoapp.domain.*
-import com.example.todoapp.retrofit.TodoItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.util.*
 
 class MainViewModel(private val todoListRepository: TodoListRepository) : ViewModel() {
 
@@ -27,6 +24,11 @@ class MainViewModel(private val todoListRepository: TodoListRepository) : ViewMo
         getListOfNotes()
         recalculationOfDoneTodos()//сликом быстро идет
         Log.d("DEBAG1", "Creation vm")
+
+       /* viewModelScope.launch {
+            todoListRepository.updateTodoList()
+        }*/
+        getListJob.cancel()
 
     }
 
@@ -118,6 +120,7 @@ class MainViewModel(private val todoListRepository: TodoListRepository) : ViewMo
 
             todoListRepository.deleteTodoItem(item, listOfNotesFlow.value.get(position).id)
             getListOfNotes()
+            recalculationOfDoneTodos()
         }
 
     }

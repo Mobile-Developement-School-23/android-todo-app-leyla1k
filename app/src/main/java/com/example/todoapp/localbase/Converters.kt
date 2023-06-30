@@ -1,8 +1,7 @@
 package com.example.todoapp.localbase
 
 import androidx.room.TypeConverter
-import com.example.todoapp.retrofit.ItemPriority
-import com.example.todoapp.retrofit.TodoItem
+import com.example.todoapp.ItemPriority
 import java.util.*
 
 class Converters {
@@ -24,7 +23,7 @@ class Converters {
         }
     }
     @TypeConverter
-    fun choosePriorityByInt(value: Int):ItemPriority {
+    fun choosePriorityByInt(value: Int): ItemPriority {
         return when (value) {
             ItemPriority.LOW.value -> ItemPriority.LOW
             ItemPriority.URGENT.value -> ItemPriority.URGENT

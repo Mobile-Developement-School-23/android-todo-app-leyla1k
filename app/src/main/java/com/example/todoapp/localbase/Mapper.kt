@@ -1,6 +1,6 @@
 package com.example.todoapp.localbase
 
-import com.example.todoapp.retrofit.TodoItem
+import com.example.todoapp.TodoItem
 
 fun TodoItem.toDbModel(): TodoDataItem {
 

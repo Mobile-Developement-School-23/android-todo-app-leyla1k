@@ -4,12 +4,10 @@ import android.util.Log
 import com.example.todoapp.localbase.TodoItemDao
 import com.example.todoapp.localbase.toDbModel
 import com.example.todoapp.localbase.toListOfToDoEntyty
-import com.example.todoapp.retrofit.ItemPriority
-import com.example.todoapp.retrofit.TodoItem
+import com.example.todoapp.retrofit.todoApi
 import kotlinx.coroutines.flow.*
-import java.util.*
 
-class TodoListRepositoryImpl(private val dao: TodoItemDao) : TodoListRepository {
+class TodoListRepositoryImpl(private val dao: TodoItemDao/*, private val todoApi: todoApi*/) : TodoListRepository {
 
     init{
         var count: Int = 1
@@ -17,6 +15,8 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao) : TodoListRepository 
         Log.d("countReposit", "((")
 
     }
+
+
 
      override fun getTodoList(): Flow<List<TodoItem>> {
          val toDoItemList = dao.getTodoListFlow()
@@ -28,16 +28,9 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao) : TodoListRepository 
         return convertedToDoItemList
     }
 
-   /* override fun getTodoItem(id: String): TodoItem {
-        return todoList.find { it.id == id } ?: throw RuntimeException("not found")
-       // return TodoItem("","",ItemPriority.LOW,null,true, Calendar.getInstance().time,null)
-    }*/
 
     override suspend fun editTodoItem(item: TodoItem) {
-
         dao.updateNote(item.toDbModel())
-
-
     }
 
     override suspend fun addTodoItem(item: TodoItem) {
@@ -45,9 +38,9 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao) : TodoListRepository 
         dao.insertTodoItem( item.toDbModel())
     }
 
-    override suspend fun deleteTodoItem(item: TodoItem,stringId:String) {
+    override suspend fun deleteTodoItem(item: TodoItem, stringId:String) {
         dao.deleteTodoItem(stringId)
-
+//затем проверяем есть ли сеть и если что работать с ворк менеджерром
     }
 
     override suspend fun deleteTodoItemWithoutPosition(item: TodoItem) {
@@ -55,6 +48,9 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao) : TodoListRepository 
     }
 
 
+    override suspend fun updateTodoList() {
+        //todoApi.updateTodoList()
+    }
 
 
 

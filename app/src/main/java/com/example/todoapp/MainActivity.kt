@@ -16,22 +16,11 @@ class MainActivity : AppCompatActivity()/*,GenVMInterface*/ {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        /*val db = MainDb.getDb(this)
-        Thread{
-            db.getDao().insertItem(item)
-        }.start()*/
-
-
-     /*   val retrofit = Retrofit.Builder().baseUrl("https://beta.mrdekk.ru/todobackend")
-            .addConverterFactory(GsonConverterFactory.create()).build()
-        val todoListRepository = retrofit.create(TodoListRepository::class.java)*/
 
 
 
 
     }
 
-    /*override fun getMainViewModel(): MainViewModel {
-        return viewModel
-    }*/
+
 }
