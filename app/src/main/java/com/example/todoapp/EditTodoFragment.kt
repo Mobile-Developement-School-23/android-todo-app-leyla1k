@@ -39,7 +39,7 @@ class EditTodoFragment : Fragment() {
         binding = FragmentTodoBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(requireActivity()) [MainViewModel::class.java]
 
-        //todoItem = viewModel.getTodoItem(todoId)
+        todoItem = viewModel.getTodoItem(todoId)
 
         init()
         setupMenu()
@@ -88,6 +88,9 @@ class EditTodoFragment : Fragment() {
             tvDelete.setTextColor(requireActivity().getColor(R.color.red))
         }
     }
+
+
+
     private fun setupListeners() {
         with(binding) {
             ivBack.setOnClickListener {
@@ -117,7 +120,11 @@ class EditTodoFragment : Fragment() {
 
                 if (todoItem.msg.isNotBlank()) {
                     todoItem.changedDate = Calendar.getInstance().time
-                   // viewModel.editTodoItem(todoItem)
+
+
+                    viewModel.editTodoItem(todoItem)
+
+
                     findNavController().popBackStack()
                 } else {
                     val decorView = requireActivity().window.decorView
@@ -132,7 +139,7 @@ class EditTodoFragment : Fragment() {
 
 
             llDelete.setOnClickListener {
-               // viewModel.deleteTodoItem(todoItem)
+                viewModel.deleteTodoItemWithoutPosition(todoItem)
                 findNavController().popBackStack()
             }
 

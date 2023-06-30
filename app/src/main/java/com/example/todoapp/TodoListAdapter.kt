@@ -93,7 +93,7 @@ class TodoListAdapter : ListAdapter<TodoItem, TodoItemViewHolder>(TodoItemDiffCa
                 onTodoItemClickListener?.invoke(item)
             }
 
-            checkboxDone.setOnClickListener { // Состояние чекбокса
+            /*checkboxDone.setOnClickListener { // Состояние чекбокса
                 checkboxDone.isErrorShown = false
                 if (checkboxDone.checkedState == MaterialCheckBox.STATE_CHECKED) {
                     setTodoCompeted(checkboxDone, tvMsg, root.resources)
@@ -102,7 +102,7 @@ class TodoListAdapter : ListAdapter<TodoItem, TodoItemViewHolder>(TodoItemDiffCa
                     MainFragment.countDone.value = MainFragment.countDone.value?.minus(1)
                     setTodoNotCompleted(checkboxDone, item, tvMsg, root.resources)
                 }
-            }
+            }*/
         }
     }
 

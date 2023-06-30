@@ -9,13 +9,14 @@ interface TodoListRepository {
 
      fun getTodoList(): Flow<List<TodoItem>>
 
-    suspend fun getTodoItem(id: String): TodoItem
+    // fun getTodoItem(id: String): TodoItem
 
     suspend fun editTodoItem(item: TodoItem)
 
     suspend fun addTodoItem(item: TodoItem)
 
-    suspend fun deleteTodoItem(item: TodoItem)
+    suspend fun deleteTodoItem(item: TodoItem,stringId:String)
+    suspend fun deleteTodoItemWithoutPosition(item: TodoItem)
 
 
 }

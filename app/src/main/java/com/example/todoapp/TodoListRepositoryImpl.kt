@@ -28,18 +28,16 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao) : TodoListRepository 
         return convertedToDoItemList
     }
 
-    override suspend fun getTodoItem(id: String): TodoItem {
-       // return todoList.find { it.id == id } ?: throw RuntimeException("not found")
-        return TodoItem("","",ItemPriority.LOW,null,true, Calendar.getInstance().time,null)
-    }
+   /* override fun getTodoItem(id: String): TodoItem {
+        return todoList.find { it.id == id } ?: throw RuntimeException("not found")
+       // return TodoItem("","",ItemPriority.LOW,null,true, Calendar.getInstance().time,null)
+    }*/
 
     override suspend fun editTodoItem(item: TodoItem) {
-       /* val oldElement = todoList.find { it.id == item.id }
-        val index = todoList.indexOf(oldElement)
 
-        todoList[index] = item
+        dao.updateNote(item.toDbModel())
 
-        updateTodoList()*/
+
     }
 
     override suspend fun addTodoItem(item: TodoItem) {
@@ -47,10 +45,13 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao) : TodoListRepository 
         dao.insertTodoItem( item.toDbModel())
     }
 
-    override suspend fun deleteTodoItem(item: TodoItem) {
-      /*  todoList.remove(item)
+    override suspend fun deleteTodoItem(item: TodoItem,stringId:String) {
+        dao.deleteTodoItem(stringId)
 
-        updateTodoList()*/
+    }
+
+    override suspend fun deleteTodoItemWithoutPosition(item: TodoItem) {
+        dao.deleteTodoItem(item.id)
     }
 
 

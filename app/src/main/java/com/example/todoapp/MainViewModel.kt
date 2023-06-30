@@ -6,6 +6,7 @@ import com.example.todoapp.domain.*
 import com.example.todoapp.retrofit.TodoItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
@@ -14,34 +15,35 @@ class MainViewModel(private val todoListRepository: TodoListRepository) : ViewMo
 
     private val _listOfNotesFlow = MutableStateFlow<List<TodoItem>>(emptyList())
     val listOfNotesFlow: StateFlow<List<TodoItem>> = _listOfNotesFlow.asStateFlow()
+
+
+    private val _countOfDoneFlow = MutableStateFlow<Int>(0)
+    val countOfDoneFlow: StateFlow<Int> = _countOfDoneFlow.asStateFlow()
+
     private lateinit var getListJob: Job
 
-    //var todoListLiveData = MutableLiveData<List<TodoItem>>()
-    /* val todoListLiveData : MutableLiveData<List<TodoItem>> by lazy{
-        MutableLiveData<List<TodoItem>>()
-    }*/
-
-
-    /*private*/ //var todoList: List<TodoItem> =  mutableListOf<TodoItem>()
-
-/*    val someData: LiveData<Boolean>
-        get() = todoListLiveData*/
-
-
-    //val todoList = getTodoListUseCase.getTodoList()
 
     init {
         getListOfNotes()
-        Log.d("DEBAG1","Creation vm")
+        recalculationOfDoneTodos()//сликом быстро идет
+        Log.d("DEBAG1", "Creation vm")
 
-        viewModelScope.launch(Dispatchers.IO)
-        {
+    }
 
-                getListOfNotes()
 
-                listOfNotesFlow.collect {
-                    Log.d("DEBAG4", "listOfNotesFlow" + it.size.toString())
+    fun recalculationOfDoneTodos(){
+       var count=0
+        viewModelScope.launch {
+            delay(500)//потом этот момент доработаю
+            listOfNotesFlow.value.forEach { element ->
+                if (element.isCompleted){
+                   count+=1
                 }
+
+            }
+            _countOfDoneFlow.value = count
+            Log.d("MainViewModel", "count=" + _countOfDoneFlow.value)
+            getListOfNotes()
         }
 
     }
@@ -58,9 +60,6 @@ class MainViewModel(private val todoListRepository: TodoListRepository) : ViewMo
                     }
 
                 }
-              _listOfNotesFlow.collect {
-                    Log.d("DEBAG111", it.size.toString())
-                }
             }
         }
     }
@@ -73,45 +72,64 @@ class MainViewModel(private val todoListRepository: TodoListRepository) : ViewMo
     }
 
 
-    /*suspend fun updateTodoList() {///
-        todoListLiveData.postValue(todoList )
+    fun getTodoItem(id: String): TodoItem {
+        // (перебор пока не найдешь с айди)
+        return listOfNotesFlow.value.find { it.id == id } ?: throw RuntimeException("not found")
+        //return todoListRepository.getTodoItem(id)
+    }
 
-        Log.d("updateTodoList", "inFun")
-        Log.d("updateTodoList", todoListLiveData.value.toString()+ " =livedata")
+     fun editTodoItem(item: TodoItem) {
+        viewModelScope.launch(Dispatchers.IO) {
+            todoListRepository.editTodoItem(item)
 
-    }*/
-
-    /*fun getTodoItem(id: String): TodoItem {
-        return getTodoItemUseCase.getTodoItem(id)
-    }*/
-
-    /* fun editTodoItem(item: TodoItem) {
-         editTodoItemUseCase.editTodoItem(item)
-     }*/
+        }
+        //getListOfNotes()
+    }
 
     /*fun addTodoItem(item: TodoItem) {
         addTodoItemUseCase.addTodoItem(item)
     }*/
 
 
-     fun addTodoItem(item: TodoItem) {
-
+    fun addTodoItem(item: TodoItem) {
         viewModelScope.launch(Dispatchers.IO) {
             getListOfNotes()
-            println("DEBAG2 + added into rep")
+            // println("DEBAG2 + added into rep")
             todoListRepository.addTodoItem(item)
         }
     }
 
 
-    /*   fun changeDoneState(item: TodoItem) {
-           val newItem = item.copy(isCompleted = !item.isCompleted)
-           editTodoItemUseCase.editTodoItem(newItem)
-       }
+    fun changeDoneState(item: TodoItem) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val newItem = item.copy(isCompleted = !item.isCompleted)
 
-       fun deleteTodoItem(todoItem: TodoItem) {
-           deleteTodoItemUseCase.deleteTodoItem(todoItem)
-       }
-   */
+            todoListRepository.editTodoItem(newItem)
+
+            recalculationOfDoneTodos()
+            getListOfNotes()
+
+        }
+    }
+
+
+    fun deleteTodoItem(item: TodoItem, position: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            todoListRepository.deleteTodoItem(item, listOfNotesFlow.value.get(position).id)
+            getListOfNotes()
+        }
+
+    }
+
+    fun deleteTodoItemWithoutPosition(item: TodoItem) {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            todoListRepository.deleteTodoItemWithoutPosition(item)
+            getListOfNotes()
+        }
+
+    }
+
 
 }

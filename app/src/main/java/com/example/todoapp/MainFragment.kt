@@ -22,6 +22,7 @@ import com.example.todoapp.localbase.TodoItemDao
 import com.example.todoapp.localbase.MainDb
 import com.example.todoapp.localbase.ViewModelFactory
 import kotlinx.coroutines.launch
+import kotlin.math.log
 
 class MainFragment : Fragment() {
 
@@ -36,9 +37,9 @@ class MainFragment : Fragment() {
 
     }
 
-    companion object {
+    /*companion object {
         var countDone = MutableLiveData(0)
-    }
+    }*/
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -70,10 +71,24 @@ class MainFragment : Fragment() {
 
 
 
-
-        countDone.observe(viewLifecycleOwner) {
+///////////////теперь чебурекаемсяя с этим
+        /*countDone.observe(viewLifecycleOwner) {
             binding.tvDone.text = getString(R.string.todo_done, it ?: 0)
+        }*/
+ /////////////////////////// /  //  /  ///////////
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.countOfDoneFlow.flowWithLifecycle(
+                viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED).collect {
+                val str ="Выполнено - "+ viewModel.countOfDoneFlow.value.toString()
+                //binding.tvDone.text = getString(R.string.todo_done , it ?: 0)
+                Log.d("MainFragment", "str = " + str)
+                binding.tvDone.text = str
+            }
         }
+////////////////////////
+
+
 
         binding.fabAddTodo.setOnClickListener {
             findNavController().navigate(
@@ -101,13 +116,7 @@ class MainFragment : Fragment() {
     }
 
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-    }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-    }
 
 
     override fun onDestroy() {
@@ -124,11 +133,15 @@ class MainFragment : Fragment() {
 
             setListener(object : SwipeLeftRightCallback.Listener {
                 override fun onSwipedRight(position: Int) {
-                    //  viewModel.changeDoneState(todoListAdapter.currentList[position])
+                      viewModel.changeDoneState(todoListAdapter.currentList[position])
+
+
                 }
 
                 override fun onSwipedLeft(position: Int) {
-                    // viewModel.deleteTodoItem(todoListAdapter.currentList[position])
+                     viewModel.deleteTodoItem(todoListAdapter.currentList[position],position)
+
+
                 }
             })
 
