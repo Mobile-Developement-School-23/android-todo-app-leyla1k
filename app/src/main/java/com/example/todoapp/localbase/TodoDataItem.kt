@@ -10,8 +10,8 @@ import java.util.*
 @Entity(tableName = "Items")
 data class TodoDataItem(
 
-    @PrimaryKey(autoGenerate = true)
-    val id: Long,
+    @PrimaryKey
+    val id: String,
 
     @ColumnInfo(name = "msg")
     var msg: String,

@@ -1,7 +1,12 @@
 package com.example.todoapp
 
 import android.app.DatePickerDialog
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,21 +18,21 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialSharedAxis
 import com.example.todoapp.databinding.FragmentTodoBinding
+import com.example.todoapp.network.NetworkListener
+import com.example.todoapp.network.getRevision
+import com.example.todoapp.network.setRevision
 import java.util.*
 
 class AddTodoFragment : Fragment() {
 
     private lateinit var binding: FragmentTodoBinding
-
     private lateinit var todoItem: TodoItem
-
     //private lateinit var todoListRepository:
     private var priorityMenu: PopupMenu? = null
     private val c = Calendar.getInstance()
-
-
-
+    //private val network:NetworkListener
     private val viewModel: MainViewModel by activityViewModels ()
+
 
 
     override fun onCreateView(
@@ -103,14 +108,12 @@ class AddTodoFragment : Fragment() {
 
             btnSave.setOnClickListener {
                 todoItem.msg = tvMsg.text.toString()
+                val uuid= UUID.randomUUID()
+                todoItem.id = uuid.toString()
                 if (todoItem.msg.isNotBlank()) {
-///////////////////////////////////////
-
-                           viewModel.addTodoItem(todoItem)
-
-//////////////////////////////////////
-
-
+                    viewModel.addTodoItem(checkForInternet(requireContext()),requireContext().getRevision(),todoItem)
+                    requireContext().setRevision(requireContext().getRevision()+1);
+                    Log.d("AddTodoFragment", "revision: "+ requireContext().getRevision().toString())
                     findNavController().popBackStack()
                 } else {
                     val decorView = requireActivity().window.decorView
@@ -120,14 +123,10 @@ class AddTodoFragment : Fragment() {
                         .setTextColor(requireActivity().getColor(R.color.label_primary))
                         .setBackgroundTint(requireActivity().getColor(R.color.back_secondary))
                         .show()
-
                 }
             }
-
-
         }
     }
-
 
     private fun openDatePicker() {
         if (todoItem.deadline != null) {
@@ -177,7 +176,23 @@ class AddTodoFragment : Fragment() {
             return@setOnMenuItemClickListener true
         }
     }
-
+    private fun checkForInternet(context: Context): Boolean {
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val network = connectivityManager.activeNetwork ?: return false
+            val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+            return when {
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                else -> false
+            }
+        } else {
+            @Suppress("DEPRECATION") val networkInfo =
+                connectivityManager.activeNetworkInfo ?: return false
+            @Suppress("DEPRECATION")
+            return networkInfo.isConnected
+        }
+    }
     private fun setupDate(date: Date?) {
         val c = Calendar.getInstance()
         if (date != null)

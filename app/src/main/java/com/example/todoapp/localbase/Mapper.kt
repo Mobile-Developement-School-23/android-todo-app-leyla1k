@@ -1,12 +1,13 @@
 package com.example.todoapp.localbase
 
 import com.example.todoapp.TodoItem
+import java.util.*
+
 
 fun TodoItem.toDbModel(): TodoDataItem {
-
-
     return TodoDataItem(
-        id = this.id.toLong(),
+        id = this.id,
+        //id = UUID.fromString(this.id)
         msg = this.msg,
         priority = this.priority,
         deadline = this.deadline,
@@ -17,7 +18,6 @@ fun TodoItem.toDbModel(): TodoDataItem {
 }
 
 fun TodoDataItem.toEntity(): TodoItem {
-
 
     return TodoItem(
         id = this.id.toString(),

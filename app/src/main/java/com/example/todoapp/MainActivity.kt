@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import com.example.todoapp.localbase.ViewModelFactory
 
-class MainActivity : AppCompatActivity()/*,GenVMInterface*/ {
+class MainActivity : AppCompatActivity() {
 
 
 

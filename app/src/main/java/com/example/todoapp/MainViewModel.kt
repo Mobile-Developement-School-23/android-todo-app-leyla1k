@@ -2,6 +2,8 @@ package com.example.todoapp
 
 import android.util.Log
 import androidx.lifecycle.*
+import com.example.todoapp.network.TodoListRequestDto
+import com.example.todoapp.network.mapListDtoToListEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -25,21 +27,57 @@ class MainViewModel(private val todoListRepository: TodoListRepository) : ViewMo
         recalculationOfDoneTodos()//сликом быстро идет
         Log.d("DEBAG1", "Creation vm")
 
-       /* viewModelScope.launch {
-            todoListRepository.updateTodoList()
-        }*/
-        getListJob.cancel()
+        viewModelScope.launch {
+            //сначала сделать пааачччч
+           // getListOfNotesFromInternet(downloadTodoList())
 
+
+            listFromServerToDb()
+           /* Log.d(
+                "MainViewModel",
+                "downloadTodoList: " + downloadTodoList()!!.size.toString()
+            )
+            Log.d("MainViewModel", "downloadTodoList: " + downloadTodoList())*/
+
+        }
+
+        getListJob.cancel()
     }
 
+    suspend fun listFromServerToDb(){
+       // getListOfNotesFromInternet(downloadTodoList()) //вероятно не нужный метод
+      //// // updateTodoListFromInternet()/////надо это па
 
-    fun recalculationOfDoneTodos(){
-       var count=0
+        deleteList()
+
+        downloadTodoList()!!.forEach {
+           addTodoItem(/*revision*/true,1,it)//я плохо понимаю как работать с ревизиями,
+        // поэтому пока не разберусь только так(
+        }
+        getListOfNotes()
+    }
+    suspend fun updateTodoListFromInternet(revision: Int, body: TodoListRequestDto){
+        todoListRepository.updateTodoListFromInternet(revision, body)
+    }
+suspend fun deleteList(){
+    todoListRepository.deleteList()
+}
+
+
+
+    suspend fun downloadTodoList():List<TodoItem>?{
+        return todoListRepository.downloadTodoList()
+
+}
+
+
+    fun recalculationOfDoneTodos() {
+        var count = 0
         viewModelScope.launch {
             delay(500)//потом этот момент доработаю
             listOfNotesFlow.value.forEach { element ->
-                if (element.isCompleted){
-                   count+=1
+                if (element.isCompleted) {
+                    count += 1
                 }
 
             }
@@ -48,6 +86,21 @@ class MainViewModel(private val todoListRepository: TodoListRepository) : ViewMo
             getListOfNotes()
         }
 
+    }
+    private fun getListOfNotesFromInternet(list : List<TodoItem>?) {
+        getListJob = viewModelScope.launch {
+
+                _listOfNotesFlow.update {
+                    list!!.toMutableList().apply {
+                        addAll(list!!.map { noteData ->
+                            noteData.copy()
+                        })
+
+                    }
+
+                }
+            //Log.d("MainViewModel", "getListOfNotesFromInternet: "+ _listOfNotesFlow)
+        }
     }
 
     private fun getListOfNotes() {
@@ -63,8 +116,12 @@ class MainViewModel(private val todoListRepository: TodoListRepository) : ViewMo
 
                 }
             }
+            //или тут или сначала из нета подгрузим, предварительно проверив что он у нас есть
+            /*Log.d("MainViewModel", "mergeFromList: "+todoListRepository.updateListFromInternet())
+            todoListRepository.updateListFromInternet()*/
         }
     }
+
 
     suspend fun <T> Flow<List<T>>.flattenToList() =
         flatMapConcat { it.asFlow() }.toList()
@@ -80,7 +137,7 @@ class MainViewModel(private val todoListRepository: TodoListRepository) : ViewMo
         //return todoListRepository.getTodoItem(id)
     }
 
-     fun editTodoItem(item: TodoItem) {
+    fun editTodoItem(item: TodoItem) {
         viewModelScope.launch(Dispatchers.IO) {
             todoListRepository.editTodoItem(item)
 
@@ -88,17 +145,19 @@ class MainViewModel(private val todoListRepository: TodoListRepository) : ViewMo
         //getListOfNotes()
     }
 
-    /*fun addTodoItem(item: TodoItem) {
-        addTodoItemUseCase.addTodoItem(item)
-    }*/
 
 
-    fun addTodoItem(item: TodoItem) {
+    fun addTodoItem(isConnected:Boolean, revision: Int, item: TodoItem) {
         viewModelScope.launch(Dispatchers.IO) {
             getListOfNotes()
             // println("DEBAG2 + added into rep")
             todoListRepository.addTodoItem(item)
+if(isConnected) {
+    todoListRepository.addTodoItemToInternet(revision, item)
+}
         }
+
+
     }
 
 
@@ -115,12 +174,16 @@ class MainViewModel(private val todoListRepository: TodoListRepository) : ViewMo
     }
 
 
-    fun deleteTodoItem(item: TodoItem, position: Int) {
+    fun deleteTodoItem(isConnected: Boolean,item: TodoItem, position: Int) {
         viewModelScope.launch(Dispatchers.IO) {
 
             todoListRepository.deleteTodoItem(item, listOfNotesFlow.value.get(position).id)
             getListOfNotes()
             recalculationOfDoneTodos()
+
+            if(isConnected){
+                todoListRepository.deleteTodoItemFromInternet(1,listOfNotesFlow.value.get(position).id)
+            }
         }
 
     }

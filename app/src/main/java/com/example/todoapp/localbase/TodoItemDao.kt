@@ -16,7 +16,8 @@ interface TodoItemDao {
     @Query("SELECT * FROM items ")
      fun getTodoListFlow(): Flow<List<TodoDataItem>> //тут может быть флоу
 
-
+    @Query("DELETE FROM items")
+    suspend fun deleteList()
 
 
     @Query("DELETE FROM items WHERE id=:TodoItemId")
