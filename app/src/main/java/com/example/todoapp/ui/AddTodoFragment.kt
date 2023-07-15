@@ -70,7 +70,7 @@ class AddTodoFragment : Fragment() {
         view.apply {
             setContent {
                var mainText = remember {mutableStateOf("Что нужно сделать..")}
-                val checkedState = remember { mutableStateOf(true) }
+                val checkedState = remember { mutableStateOf(false) }
                 Column(
                     modifier = Modifier.padding(5.dp,30.dp ),
                 ) {

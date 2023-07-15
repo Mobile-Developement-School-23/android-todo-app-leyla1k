@@ -10,8 +10,6 @@ import androidx.recyclerview.widget.ListAdapter
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.textview.MaterialTextView
 import com.example.todoapp.databinding.ItemTodoBinding
-import com.example.todoapp.ui.rv.TodoItemDiffCallback
-import com.example.todoapp.ui.rv.TodoItemViewHolder
 import java.util.*
 
 class TodoListAdapter : ListAdapter<TodoItem, TodoItemViewHolder>(TodoItemDiffCallback()) {

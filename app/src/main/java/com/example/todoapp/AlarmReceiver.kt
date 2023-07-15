@@ -1,4 +1,4 @@
-package com.example.todoapp.ui
+package com.example.todoapp
 
 
 import android.app.AlarmManager
@@ -19,7 +19,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+       /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
             // Create the NotificationChannel
             val name = "Alarme"
@@ -47,6 +47,6 @@ class AlarmReceiver : BroadcastReceiver() {
         val id = System.currentTimeMillis() / 1000
 
         // Show a notification
-        am.notify(id.toInt(), mBuilder.build())
+        am.notify(id.toInt(), mBuilder.build())*/
     }
 }

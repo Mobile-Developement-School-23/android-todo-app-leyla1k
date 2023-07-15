@@ -22,7 +22,6 @@ import java.util.*
 
 class TodoListRepositoryImpl(private val dao: TodoItemDao, private val todoApi: TodoApi) :
     TodoListRepository {
-
     override suspend fun refreshData() {
         Log.d("localRevision", "refreshData: иду1")
         val request = todoApi.getServerResponse()
@@ -35,10 +34,7 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao, private val todoApi: 
             updateDatabaseFromServer(request)//непач
         }
         synchronizeRevisions()
-
     }
-
-
     private suspend fun updateServerFromDatabase(request: TodoListResponseDto) {
         dao.getTodoListFlow().collect { itm ->
             if (!itm.isNullOrEmpty()) {
@@ -49,14 +45,15 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao, private val todoApi: 
                 todoApi.updateServerFromDb(request.revision, currentRequest)
             }
         }
-
     }
-
     override suspend fun createRevision() {
         try {
+
             dao.getRevision(1).value
+            Log.d("DEBAGGING2", "createRevision: ")
         } catch (e: Exception) {
-            dao.insertRevision(DbRevision(1, 1))
+            Log.d("DEBAGGING", "createRevision: ")
+            dao.insertRevision(DbRevision(1, 0))
         }
     }
     private suspend fun updateDatabaseFromServer(request: TodoListResponseDto) {
@@ -73,15 +70,12 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao, private val todoApi: 
             }
         }
     }
-
     private suspend fun synchronizeRevisions() {
-        withContext(Dispatchers.IO) {//
+        withContext(Dispatchers.IO) {
             val response = todoApi.getServerResponse()
-
             dao.updateRevision(DbRevision(Constants.REVISION_ID, response.revision))
-        }//
+        }
     }
-
     private suspend fun TodoListRepositoryImpl.mergeData(
         itemsFromDatabase: List<TodoDataItem>,
         itemsFromServer: List<TodoDataItem>
@@ -99,38 +93,26 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao, private val todoApi: 
             }
         }
     }
-
-
     private suspend fun deleteItemFromDatabase(item: TodoDataItem) {
         dao.deleteTodoItem(item.id)
         Log.d("TAGINCR3", "!!!!!!!!!!")
         increaseRevision()
     }
-
     private suspend fun updateItemToDatabase(item: TodoDataItem) {
         dao.updateTodoItem(item)
         Log.d("TAGINCR4", "!!!!!!!!!!")
         increaseRevision()
     }
-
     private suspend fun insertItemToDatabase(item: TodoDataItem) {
         dao.insertTodoItem(item)
         Log.d("TAGINCR5", "!!!!!!!!!!")
         increaseRevision()
     }
-
-   /* private suspend fun insertRevision() {
-        val revisionObj: DbRevision
-        revisionObj.vale\u
-        insertRevision(revisionObj)
-    }*/
-
     private suspend fun getRevision(): Int {
         val revisionObj: DbRevision = dao.getRevision()
 
         return revisionObj.value
     }
-
     private suspend fun increaseRevision() {
         val revisionObj: DbRevision = dao.getRevision()
         revisionObj.value += 1
@@ -138,13 +120,12 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao, private val todoApi: 
         Log.d("TAGINCR1", "!!!!!!!!!!")
         Log.d("TodoListRep", "updateRevision: ")
     }
-    suspend fun updateRevisionLikeServer(rev:Int) {
+    private suspend fun updateRevisionLikeServer(rev:Int) {
         val revisionObj: DbRevision = dao.getRevision()
         revisionObj.value = rev
         dao.updateRevision(revisionObj)
         Log.d("TAGINCR2", "!!!!!!!!!!")
     }
-
     override suspend fun editTodoItemToInternet(newItem: TodoItem) {
         val raw = todoApi.editTodoItemToInternet(
             getRevision(), UUID.fromString(newItem.id),
@@ -155,41 +136,30 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao, private val todoApi: 
             updateRevisionLikeServer(response.revision)
         }
     }
-
     override suspend fun addTodoItemToInternet(item: TodoItem) {/////////////////////////////////////////
         Log.d("addTodoItem_responseItem", item.toString())
         val raw = todoApi.loadTodoItem(
             getRevision(),
             mapTodoItemToItemRequestDto(item)
         )
-
-        Log.d("addTodoItem_response", raw.raw().toString())
-        Log.d("addTodoItem_r1", raw.raw().toString())
-        Log.d("addTodoItem_rev11111", getRevision().toString())
-        Log.d("addTodoItem_rev21", raw.body()?.revision.toString())
         val response = raw.body()
         if (response != null) {
             updateRevisionLikeServer(response.revision)
         }
 
     }
-
     override suspend fun deleteList() {
         dao.deleteList()
     }
-
-
     override suspend fun updateListFromInternet(
         revision: Int,
         body: TodoListRequestDto
     ) {
         todoApi.updateServerFromDb(revision, body)
     }
-
     override suspend fun downloadTodoList(): List<TodoItem>? {
         return mapListDtoToTodoItemList(todoApi.downloadTodoList().body()!!.list)
     }
-
     override suspend fun deleteTodoItemFromInternet(id: String) {
         val raw = todoApi.deleteTodoItem(getRevision(), UUID.fromString(id))
         val response = raw.body()
@@ -199,8 +169,6 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao, private val todoApi: 
         }
         Log.d("TodoListRepositoryImpl", "deleteTodoItemFromInternet: " + id)
     }
-
-
     override fun getTodoList(): Flow<List<TodoItem>> {
 
         val toDoItemList = dao.getTodoListFlow()
@@ -208,36 +176,22 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao, private val todoApi: 
             println("DEBAG2 +${it.size}")
             it.toListOfToDoEntyty()
         }
-
         return convertedToDoItemList
     }
-
-
     override suspend fun editTodoItem(item: TodoItem) {
         dao.updateTodoItem(item.toDbModel())
     }
-
     override suspend fun addTodoItem(item: TodoItem) {
         Log.d("TodoListRepositoryImpl", "addTodoItem: insertion")
         dao.insertTodoItem(item.toDbModel())
     }
-
     override suspend fun updateTodoListFromInternet(revision: Int, body: TodoListRequestDto) {
         todoApi.updateServerFromDb(revision, body)/////////
     }
-
     override suspend fun deleteTodoItem(item: TodoItem, stringId: String) {
         dao.deleteTodoItem(stringId)
     }
-
     override suspend fun deleteTodoItemWithoutPosition(item: TodoItem) {
         dao.deleteTodoItem(item.id)
     }
-
-
-    /* override suspend fun updateTodoList() {
-         //todoApi.updateTodoList()
-     }*/
-
-
 }

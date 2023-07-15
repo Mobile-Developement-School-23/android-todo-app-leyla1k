@@ -1,19 +1,12 @@
 package com.example.todoapp.ui
 
-import android.Manifest
 import android.app.AlarmManager
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationManagerCompat
-import androidx.fragment.app.FragmentManager
+import com.example.todoapp.AlarmReceiver
 import com.example.todoapp.R
 import java.util.Calendar
 
@@ -31,6 +24,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
+/*
 
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlarmReceiver::class.java)
@@ -55,6 +49,7 @@ class MainActivity : AppCompatActivity() {
             pendingIntent
         )
 
+*/
 
 
         }
