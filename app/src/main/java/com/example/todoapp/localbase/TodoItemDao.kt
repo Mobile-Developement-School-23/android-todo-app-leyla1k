@@ -12,9 +12,10 @@ interface TodoItemDao {
     @Insert
      suspend fun insertTodoItem(item: TodoDataItem)
 
-
+   /* @Insert
+    suspend fun insertRevision(rev: DbRevision)*/
     @Query("SELECT * FROM items ")
-     fun getTodoListFlow(): Flow<List<TodoDataItem>> //тут может быть флоу
+     fun getTodoListFlow(): Flow<List<TodoDataItem>>
 
     @Query("DELETE FROM items")
     suspend fun deleteList()
@@ -25,13 +26,18 @@ interface TodoItemDao {
 
 
     @Update
-    suspend fun updateNote(note: TodoDataItem)
+    suspend fun updateTodoItem(note: TodoDataItem)
 
     @Query("SELECT * FROM items")
     suspend fun getTodoItem():TodoDataItem
 
 
-    /*@Query ("UPDATE items SET isDone = NOT isDone WHERE id==:noteId")
-    fun updateDoneStatus(noteId : Int)*/
+    @Query("SELECT * from revision WHERE id = :id")
+    suspend fun getRevision(id: Int = 1): DbRevision
+
+    @Update
+    suspend fun updateRevision(revision: DbRevision)
+/////////////////////////////////////////////////ьудет ли запускаться на другом устройстве если введено вручную хммммм очевидно нет, ввести надо актуальную ревизию
+
 
 }

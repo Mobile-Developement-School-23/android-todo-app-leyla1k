@@ -1,5 +1,6 @@
 package com.example.todoapp
 
+import android.content.Context
 import com.example.todoapp.network.TodoListRequestDto
 import kotlinx.coroutines.flow.Flow
 
@@ -15,18 +16,18 @@ interface TodoListRepository {
     suspend fun addTodoItem(item: TodoItem)
 
     suspend fun deleteTodoItem(item: TodoItem, stringId:String)
-
+/*    fun insertRevision()*/
     suspend fun deleteTodoItemWithoutPosition(item: TodoItem)
 
-    suspend fun updateTodoList()
+    /*suspend fun updateTodoList()*/
     suspend fun deleteList()
     suspend fun updateTodoListFromInternet( revision: Int,
                                             body: TodoListRequestDto)
-
-    ////возможно в другой реп
+    suspend fun refreshData()
     suspend fun downloadTodoList():List<TodoItem>?
-    suspend fun deleteTodoItemFromInternet(revision: Int,id:String)
+    suspend fun deleteTodoItemFromInternet(id:String)
 
-    suspend fun addTodoItemToInternet(revision:Int,item: TodoItem)
+    suspend fun addTodoItemToInternet(item: TodoItem)
     suspend fun updateListFromInternet(revision: Int, body: TodoListRequestDto)
+    suspend fun editTodoItemToInternet(newItem: TodoItem)
 }

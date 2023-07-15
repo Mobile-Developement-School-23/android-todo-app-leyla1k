@@ -7,7 +7,7 @@
     android:clickable="true"
     android:focusable="true"
     app:cardCornerRadius="0dp"
-    app:cardBackgroundColor="@color/back_secondary">
+    style="@style/CardView">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -50,9 +50,7 @@
                 android:maxLines="3"
                 android:text="@string/add_new_todo"
                 android:ellipsize="end"
-                android:fontFamily="@font/roboto_regular"
-                android:textColor="@color/label_primary"
-                android:textSize="16sp" />
+                android:textAppearance="@style/TextViewRV" />
         </LinearLayout>
         <ImageView
             android:id="@+id/iv_info"
@@ -75,9 +73,7 @@
             android:layout_marginTop="5dp"
             android:maxLines="3"
             android:text="@string/date"
-            android:textColor="@color/label_tertiary"
-            android:fontFamily="@font/roboto_regular"
-            android:textSize="14sp"
+            android:textAppearance="@style/TextViewSmallRV"
             app:layout_constraintEnd_toStartOf="@+id/iv_info"
             app:layout_constraintStart_toEndOf="@+id/checkbox_done"
             app:layout_constraintTop_toBottomOf="@+id/ll_msg" />

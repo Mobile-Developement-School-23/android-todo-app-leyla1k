@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/back_primary">
+    style="@style/AppBarLayout">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -46,7 +46,7 @@
             android:layout_marginHorizontal="20dp"
             android:layout_marginTop="100dp"
             android:minHeight="108dp"
-            app:cardBackgroundColor="@color/back_secondary"
+            style="@style/CardView"
             app:cardCornerRadius="8dp"
             app:cardElevation="2dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -55,18 +55,16 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
+                style="@style/TextInputEditText"
                 android:id="@+id/tv_msg"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:minHeight="108dp"
-                android:backgroundTint="@color/back_secondary"
                 android:gravity="top"
-                android:fontFamily="@font/roboto_regular"
                 android:hint="@string/msg_hint"
                 android:padding="16dp"
-                android:textColor="@color/label_primary"
-                android:textColorHint="@color/label_tertiary"
-                android:textSize="16sp" />
+
+                 />
         </com.google.android.material.card.MaterialCardView>
 
 
@@ -76,10 +74,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="30dp"
-            android:fontFamily="@font/roboto_regular"
+
             android:text="@string/priority_title"
-            android:textColor="@color/label_primary"
-            android:textSize="16sp"
+            android:textAppearance="@style/TextViewRV"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/materialCardView" />
 
@@ -89,12 +86,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="100dp"
-            android:fontFamily="@font/roboto_regular"
+
             android:paddingTop="5dp"
             android:paddingBottom="20dp"
             android:text="@string/low_priority"
-            android:textColor="@color/label_tertiary"
-            android:textSize="14sp"
+            android:textAppearance="@style/TextViewSmallRV"
+
             app:layout_constraintStart_toStartOf="@+id/tv_priority_title"
             app:layout_constraintTop_toBottomOf="@+id/tv_priority_title" />
 
@@ -119,10 +116,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="28dp"
-            android:fontFamily="@font/roboto_regular"
+            android:textAppearance="@style/TextViewRV"
             android:text="@string/deadline_title"
-            android:textColor="@color/label_primary"
-            android:textSize="16sp"
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -186,6 +182,8 @@
                 android:layout_height="match_parent"
                 android:src="@drawable/ic_delete"
                 app:tint="@color/red"
+                android:background="?attr/selectableItemBackground"
+
                 android:contentDescription="@string/delete" />
 
             <com.google.android.material.textview.MaterialTextView
@@ -197,7 +195,9 @@
                 android:layout_marginStart="20dp"
                 android:textColor="@color/red"
                 android:textSize="16sp"
-                android:fontFamily="@font/roboto_regular"/>
+                android:fontFamily="@font/roboto_regular"
+
+                />
 
         </LinearLayout>
 

@@ -4,9 +4,8 @@ import android.os.Build
 import com.example.todoapp.ItemPriority
 import com.example.todoapp.TodoItem
 import java.util.*
-import java.util.UUID.fromString
 
-fun mapDtoToEntity(todoItem: TodoItemDto) = TodoItem(
+fun mapDtoToTodoItem(todoItem: TodoItemDto) = TodoItem(
         id = todoItem.id.toString(),
         msg = todoItem.msg,
         priority = mapStringToPriority(todoItem.priority),
@@ -17,14 +16,14 @@ fun mapDtoToEntity(todoItem: TodoItemDto) = TodoItem(
     )
 
 
-fun mapEntityToItemRequestDto(item: TodoItem) = TodoItemRequestDto(
-    element = mapEntityToDto(item)
+fun mapTodoItemToItemRequestDto(item: TodoItem) = TodoItemRequestDto(
+    element = mapTodoItemToDto(item)
 )
 
 
 
 
-    fun mapEntityToDto(todoItem: TodoItem) = TodoItemDto(
+    fun mapTodoItemToDto(todoItem: TodoItem) = TodoItemDto(
         id = UUID.fromString(todoItem.id),
         //id =  UUID.nameUUIDFromBytes(todoItem.id.toByteArray()),
         msg = todoItem.msg,
@@ -37,9 +36,11 @@ fun mapEntityToItemRequestDto(item: TodoItem) = TodoItemRequestDto(
         device = Build.DEVICE
     )
 
-    fun mapListDtoToListEntity(list: List<TodoItemDto>) = list.map {
-        mapDtoToEntity(it)
-    }
+fun mapListDtoToTodoItemList(list: List<TodoItemDto>) = list.map {
+    mapDtoToTodoItem(it)
+}
+
+
 
    /* fun mapListEntityToListRequestDto(list: List<TodoItem>) = TodoListRequestDto(
         list = list.map {mapEntityToDto(it)}

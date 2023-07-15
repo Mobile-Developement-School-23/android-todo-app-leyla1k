@@ -1,6 +1,7 @@
-package com.example.todoapp
+package com.example.todoapp.ui.rv
 
 import androidx.recyclerview.widget.DiffUtil
+import com.example.todoapp.TodoItem
 
 class TodoItemDiffCallback : DiffUtil.ItemCallback<TodoItem>() {
 

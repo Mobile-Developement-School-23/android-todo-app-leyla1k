@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/undone"
+
+        android:title="Только незавершенные задания"/>
+    <item
+        android:id="@+id/dark_theme"
+        android:title="Включить темную тему"/>
+    <item
+        android:id="@+id/light_theme"
+        android:title="Включить светлую тему"/>
+
+
+</menu>

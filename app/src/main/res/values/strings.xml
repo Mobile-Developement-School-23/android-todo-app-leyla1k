@@ -12,4 +12,7 @@
     <string name="low_priority">Нет</string>
     <string name="deadline_title">Сделать до</string>
     <string name="delete">Удалить</string>
+    <string name="network_error_message">Ошибка соединения. Загружены данные из локального хранилища</string>
+
+
 </resources>

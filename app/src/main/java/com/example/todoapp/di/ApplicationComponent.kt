@@ -1,9 +1,6 @@
 package com.example.todoapp.di
 
-import android.content.Context
-import androidx.core.view.KeyEventDispatcher
-import com.example.todoapp.MainFragment
-import dagger.BindsInstance
+import com.example.todoapp.ui.MainFragment
 import dagger.Component
 
 

@@ -1,7 +1,6 @@
 package com.example.todoapp.localbase
 
 import com.example.todoapp.TodoItem
-import java.util.*
 
 
 fun TodoItem.toDbModel(): TodoDataItem {
@@ -17,7 +16,7 @@ fun TodoItem.toDbModel(): TodoDataItem {
     )
 }
 
-fun TodoDataItem.toEntity(): TodoItem {
+fun TodoDataItem.toTodoItem(): TodoItem {
 
     return TodoItem(
         id = this.id.toString(),
@@ -32,7 +31,7 @@ fun TodoDataItem.toEntity(): TodoItem {
 }
 
 fun List<TodoDataItem>.toListOfToDoEntyty(): List<TodoItem> {
-    return map { it.toEntity() }
+    return map { it.toTodoItem() }
 }
 
 

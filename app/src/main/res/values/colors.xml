@@ -5,7 +5,6 @@
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
-
     <!-- Color -->
     <color name="red">#FF3B30</color>
     <color name="green">#34C759</color>
@@ -14,21 +13,42 @@
     <color name="gray_light">#D1D1D6</color>
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>
-
     <!-- Back -->
     <color name="back_primary">#F7F6F2</color>
     <color name="back_secondary">#FFFFFF</color>
     <color name="back_elevated">#FFFFFF</color>
-
     <!-- Label -->
     <color name="label_primary">#000000</color>
     <color name="label_secondary">#99000000</color>
     <color name="label_tertiary">#4D000000</color>
     <color name="label_disable">#26000000</color>
-
-
     <!-- Support -->
     <color name="support_separator">#33000000</color>
     <color name="support_overlay">#0F000000</color>
+
+
+
+    <!-- Color -->
+    <color name="red_night">#A62E27</color>
+    <color name="green_night">#306C3F</color>
+    <color name="blue_night">#2F4B68</color>
+    <color name="gray_night">#2E2E30</color>
+    <color name="gray_light_night">#5C5C61</color>
+    <color name="white_night">#858080</color>
+    <color name="black_night">#FFFFFF</color>
+    <!-- Back -->
+    <color name="back_primary_night">#3C3C3A</color>
+    <color name="back_secondary_night">#656262</color>
+    <color name="back_elevated_night">#A8A4A4</color>
+    <!-- Label -->
+    <color name="label_primary_night">#FFFFFF</color>
+    <color name="label_secondary_night">#99D5D0D0</color>
+    <color name="label_tertiary_night">#4DA69A9A</color>
+    <color name="label_disable_night">#26857A7A</color>
+    <!-- Support -->
+    <color name="support_separator_night">#33000000</color>
+    <color name="support_overlay_night">#0F000000</color>
+
+
 
 </resources>

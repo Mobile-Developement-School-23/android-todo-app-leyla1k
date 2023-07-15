@@ -6,11 +6,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.ListAdapter
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.textview.MaterialTextView
 import com.example.todoapp.databinding.ItemTodoBinding
+import com.example.todoapp.ui.rv.TodoItemDiffCallback
+import com.example.todoapp.ui.rv.TodoItemViewHolder
 import java.util.*
 
 class TodoListAdapter : ListAdapter<TodoItem, TodoItemViewHolder>(TodoItemDiffCallback()) {
@@ -81,7 +82,7 @@ class TodoListAdapter : ListAdapter<TodoItem, TodoItemViewHolder>(TodoItemDiffCa
 
 
             if (item.isCompleted){ // Состояние чекбокса
-               setTodoCompeted(checkboxDone, tvMsg, root.resources)
+               setTodoCompleted(checkboxDone, tvMsg, root.resources)
 
             }else{
                 setTodoNotCompleted(checkboxDone, item, tvMsg, root.resources)
@@ -104,13 +105,11 @@ class TodoListAdapter : ListAdapter<TodoItem, TodoItemViewHolder>(TodoItemDiffCa
         }
     }
 
-    private fun setTodoCompeted(box: MaterialCheckBox, tv: MaterialTextView, resources: Resources){
+    private fun setTodoCompleted(box: MaterialCheckBox, tv: MaterialTextView, resources: Resources){
         box.checkedState = MaterialCheckBox.STATE_CHECKED
 
-        tv.setTextColor(
-            ResourcesCompat.getColor(resources, R.color.label_tertiary, null)
-        )
 
+        tv.setTextAppearance(R.style.TextViewRCompleted)
         box.isErrorShown = false
 
         tv.paintFlags =  Paint.STRIKE_THRU_TEXT_FLAG
@@ -121,9 +120,8 @@ class TodoListAdapter : ListAdapter<TodoItem, TodoItemViewHolder>(TodoItemDiffCa
 
         box.isErrorShown = item.priority == ItemPriority.URGENT
 
-        tv.setTextColor(
-            ResourcesCompat.getColor(resources, R.color.label_primary, null)
-        )
+         tv.setTextAppearance(R.style.TextViewR)
+
 
         tv.paintFlags = 0
 

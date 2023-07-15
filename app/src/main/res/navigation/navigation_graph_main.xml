@@ -7,17 +7,25 @@
 
     <fragment
         android:id="@+id/fragmentMain"
-        android:name="com.example.todoapp.MainFragment"
+        android:name="com.example.todoapp.ui.MainFragment"
         android:label="FragmentMain"
         tools:layout="@layout/fragment_main">
 
         <action
             android:id="@+id/action_add_todo"
-            app:destination="@id/fragmentAddTodo"/>
+            app:destination="@id/fragmentAddTodo"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
 
         <action
             android:id="@+id/action_edit_todo"
-            app:destination="@id/fragmentEditTodo">
+            app:destination="@id/fragmentEditTodo"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right">
             <argument
                 android:name="todoId"
                 app:argType="string" />
@@ -26,13 +34,13 @@
 
     <fragment
         android:id="@+id/fragmentAddTodo"
-        android:name="com.example.todoapp.AddTodoFragment"
+        android:name="com.example.todoapp.ui.AddTodoFragment"
         android:label="FragmentAddTodo"
         tools:layout="@layout/fragment_todo"/>
 
     <fragment
         android:id="@+id/fragmentEditTodo"
-        android:name="com.example.todoapp.EditTodoFragment"
+        android:name="com.example.todoapp.ui.EditTodoFragment"
         android:label="FragmentEditTodo"
         tools:layout="@layout/fragment_todo">
         <argument

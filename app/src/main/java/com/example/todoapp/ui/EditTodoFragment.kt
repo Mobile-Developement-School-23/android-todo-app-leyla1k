@@ -1,4 +1,4 @@
-package com.example.todoapp
+package com.example.todoapp.ui
 
 import android.app.DatePickerDialog
 import android.os.Bundle
@@ -11,6 +11,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.example.todoapp.ItemPriority
+import com.example.todoapp.MainViewModel
+import com.example.todoapp.R
+import com.example.todoapp.TodoItem
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialSharedAxis
 import com.example.todoapp.databinding.FragmentTodoBinding
@@ -20,7 +24,7 @@ class EditTodoFragment : Fragment() {
 
     private lateinit var binding: FragmentTodoBinding
     private lateinit var viewModel: MainViewModel
-    private val todoId by lazy { navArgs<EditTodoFragmentArgs>().value.todoId }
+    private val todoId by lazy { navArgs<com.example.todoapp.ui.EditTodoFragmentArgs>().value.todoId }
     private val c = Calendar.getInstance()
     private var priorityMenu: PopupMenu? = null
 
@@ -31,8 +35,8 @@ class EditTodoFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
-        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
+       /* enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
+        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)*/
 
         binding = FragmentTodoBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(requireActivity()) [MainViewModel::class.java]
@@ -47,7 +51,7 @@ class EditTodoFragment : Fragment() {
     }
 
 
-    private fun init(){
+    private fun init(){///////поправить для темы
         with(binding){
             tvMsg.setText(todoItem.msg)
 
