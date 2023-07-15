@@ -33,10 +33,9 @@ class MainViewModel(
         getListOfNotes()
         //recalculationOfDoneTodos()//сликом быстро идет
         viewModelScope.launch {
-            // getListOfNotesFromInternet(downloadTodoList())
 
             getListOfNotes()
-           // delay(3000)
+
             refreshDataFromRepository()
                 todoListRepository.createRevision()
 
@@ -79,7 +78,7 @@ class MainViewModel(
        private fun recalculationOfDoneTodos() {
         var count = 0
         viewModelScope.launch {
-            delay(500)//потом этот момент доработаю
+            delay(1500)//потом этот момент доработаю
             listOfNotesFlow.value.forEach { element ->
                 if (element.isCompleted) {
                     count += 1
@@ -115,14 +114,17 @@ class MainViewModel(
             todoListRepository.editTodoItem(item)
             try {
                 todoListRepository.editTodoItemToInternet(item)
+                onSuccessResponse()
             } catch (e: Exception) {
+                onUnsuccessfulResponse()
                 Log.v("updateItem", e.message.toString())
             }
         }
     }
     fun addTodoItem(item: TodoItem) {
         viewModelScope.launch(Dispatchers.IO) {
-            getListOfNotes()
+           // getListOfNotes()
+            Log.d("insertItem", "insert")
             todoListRepository.addTodoItem(item)
             try {
                 todoListRepository.addTodoItemToInternet(item)
@@ -131,6 +133,7 @@ class MainViewModel(
                 onUnsuccessfulResponse()
                 Log.v("insertItem", e.message.toString())
             }
+
             //todoListRepository.addTodoItemToInternet(item)
         }
     }
@@ -138,8 +141,8 @@ class MainViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val newItem = item.copy(isCompleted = !item.isCompleted)
             todoListRepository.editTodoItem(newItem)
-            recalculationOfDoneTodos()
-            getListOfNotes()
+            //recalculationOfDoneTodos()
+            //getListOfNotes()
             todoListRepository.editTodoItemToInternet(newItem)
         }
     }
@@ -155,13 +158,13 @@ class MainViewModel(
             }
 
         }
-        recalculationOfDoneTodos()
-        getListOfNotes()
+        //recalculationOfDoneTodos()
+        //getListOfNotes()
     }
     fun deleteTodoItemWithoutPosition(item: TodoItem) {
         viewModelScope.launch(Dispatchers.IO) {
             todoListRepository.deleteTodoItemWithoutPosition(item)
-            getListOfNotes()
+            //getListOfNotes()
         }
 
     }

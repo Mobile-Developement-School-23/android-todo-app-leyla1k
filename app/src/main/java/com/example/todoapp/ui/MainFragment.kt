@@ -79,7 +79,7 @@ class MainFragment : Fragment() {
         binding.btnSettings.setOnClickListener {
             popupMenuSettings?.show()
         }
-
+        Log.d("SAVING", "SaveBtn:1 ")
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.listOfNotesFlow.flowWithLifecycle(
 

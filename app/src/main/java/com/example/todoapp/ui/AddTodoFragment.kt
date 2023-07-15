@@ -71,22 +71,25 @@ class AddTodoFragment : Fragment() {
             setContent {
                var mainText = remember {mutableStateOf("Что нужно сделать..")}
                 val checkedState = remember { mutableStateOf(false) }
+
+
+
                 Column(
                     modifier = Modifier.padding(5.dp,30.dp ),
                 ) {
                     Row() {
-
                         ImgClose()
-                        Row(modifier = Modifier, horizontalArrangement = Arrangement.Center) {
-                            SaveBtn(mainText)
-                        }
+                        SaveBtn(mainText)
+
                     }
+
                     MainCard(mainText)
                     Text(text = "Важность", style = TextStyle( fontSize = 16.sp,))
                     Text(text = "Нет")
                     Spacer(modifier = Modifier.height(30.dp))
                     Divider(color = Color.Black)
                     Spacer(modifier = Modifier.height(30.dp))
+
                     Row() {
                         Column(
                             modifier = Modifier,
@@ -96,6 +99,8 @@ class AddTodoFragment : Fragment() {
                         }
                     Checkbox(checked = checkedState.value, onCheckedChange = { checkedState.value = it })
                     }
+
+
                     Spacer(modifier = Modifier.height(30.dp))
                     Divider(color = Color.Black)
                     Spacer(modifier = Modifier.height(30.dp))
@@ -104,8 +109,15 @@ class AddTodoFragment : Fragment() {
                         Text(text="Удалить",color = Color.Red)
                     }
                 }
+
+
+
+
             }
         }
+
+
+
         todoItem = TodoItem(
             id = c.timeInMillis.toString(),
             msg = "",
@@ -115,6 +127,7 @@ class AddTodoFragment : Fragment() {
             createDate = Calendar.getInstance().time,
             changedDate = null
         )
+
         return view
         /* binding = FragmentTodoBinding.inflate(inflater, container, false)
           with(binding) {
@@ -170,13 +183,13 @@ class AddTodoFragment : Fragment() {
     fun SaveBtn(mainText:MutableState<String>) {
         var text by remember { mainText }
         Button(onClick = {
-
-            todoItem.msg = text
             Log.d("SaveBtn", "SaveBtn: "+todoItem.msg)
             val uuid = UUID.randomUUID()
             todoItem.id = uuid.toString()
+            todoItem.msg = text
             if (todoItem.msg.isNotBlank()) {
 
+                Log.d("SaveBtn", "todoitemid: " + todoItem.id)
                 viewModel.addTodoItem(todoItem)
 
                 findNavController().popBackStack()

@@ -15,11 +15,11 @@ import com.example.todoapp.R
 import okhttp3.internal.notify
 
 
-class AlarmReceiver : BroadcastReceiver() {
+class AlarmReceiver /*: BroadcastReceiver()*/ {
 
-    override fun onReceive(context: Context?, intent: Intent?) {
+   /* override fun onReceive(context: Context?, intent: Intent?) {
 
-       /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+       *//* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
             // Create the NotificationChannel
             val name = "Alarme"
@@ -47,6 +47,6 @@ class AlarmReceiver : BroadcastReceiver() {
         val id = System.currentTimeMillis() / 1000
 
         // Show a notification
-        am.notify(id.toInt(), mBuilder.build())*/
-    }
+        am.notify(id.toInt(), mBuilder.build())*//*
+    }*/
 }

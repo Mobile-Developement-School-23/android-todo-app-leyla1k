@@ -15,7 +15,11 @@ interface TodoItemDao {
     @Insert
     suspend fun insertRevision(rev: DbRevision)
     @Query("SELECT * FROM items ")
-     fun getTodoListFlow(): Flow<List<TodoDataItem>>
+    fun getTodoListFlow(): Flow<List<TodoDataItem>>
+
+    @Query("SELECT * FROM items ")
+    fun getTodoListAsList(): List<TodoDataItem>
+
 
     @Query("DELETE FROM items")
     suspend fun deleteList()
@@ -33,8 +37,11 @@ interface TodoItemDao {
 
 
     @Query("SELECT * from revision WHERE id = :id")
-    suspend fun getRevision(id: Int = 1): DbRevision
+     fun getRevision(id: Int = 1): DbRevision
 
+
+    @Query("SELECT * from revision WHERE id = :id")
+   suspend fun getRevisionForCreating(id: Int = 1): DbRevision
     @Update
     suspend fun updateRevision(revision: DbRevision)
 
