@@ -39,6 +39,7 @@ class MainViewModel(
             getListOfNotes()
            // delay(3000)
             refreshDataFromRepository()
+            todoListRepository.createRevision()
 
 
 

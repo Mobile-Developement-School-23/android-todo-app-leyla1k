@@ -12,8 +12,8 @@ interface TodoItemDao {
     @Insert
      suspend fun insertTodoItem(item: TodoDataItem)
 
-   /* @Insert
-    suspend fun insertRevision(rev: DbRevision)*/
+    @Insert
+    suspend fun insertRevision(rev: DbRevision)
     @Query("SELECT * FROM items ")
      fun getTodoListFlow(): Flow<List<TodoDataItem>>
 
@@ -37,7 +37,6 @@ interface TodoItemDao {
 
     @Update
     suspend fun updateRevision(revision: DbRevision)
-/////////////////////////////////////////////////ьудет ли запускаться на другом устройстве если введено вручную хммммм очевидно нет, ввести надо актуальную ревизию
 
 
 }

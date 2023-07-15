@@ -52,7 +52,13 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao, private val todoApi: 
 
     }
 
-
+    override suspend fun createRevision() {
+        try {
+            dao.getRevision(1).value
+        } catch (e: Exception) {
+            dao.insertRevision(DbRevision(1, 1))
+        }
+    }
     private suspend fun updateDatabaseFromServer(request: TodoListResponseDto) {
         val itemsFromServer = request.list.map {
             mapDtoToTodoItem(it).toDbModel()

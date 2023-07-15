@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 
 interface TodoListRepository {
-
+    suspend fun createRevision()
      fun getTodoList(): Flow<List<TodoItem>>
 
     // fun getTodoItem(id: String): TodoItem
