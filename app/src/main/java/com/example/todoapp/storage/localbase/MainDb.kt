@@ -1,4 +1,4 @@
-package com.example.todoapp.localbase
+package com.example.todoapp.storage.localbase
 
 import android.content.Context
 import androidx.room.Database

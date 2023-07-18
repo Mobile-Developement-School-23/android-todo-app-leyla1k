@@ -1,6 +1,7 @@
-package com.example.todoapp.ui
+package com.example.todoapp.ui.fragments
 
 import android.app.DatePickerDialog
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,7 +25,6 @@ import androidx.compose.material.Card
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
@@ -34,10 +33,8 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.todoapp.ItemPriority
-import com.example.todoapp.MainViewModel
 import com.example.todoapp.R
 import com.example.todoapp.TodoItem
 import com.google.android.material.snackbar.Snackbar
@@ -48,10 +45,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import androidx.fragment.app.viewModels
+import com.example.todoapp.ui.viewmodels.AddTodoViewModel
+import com.example.todoapp.TodoApplication
+import com.example.todoapp.di.TodoScope
+import javax.inject.Inject
 
+@TodoScope
 class AddTodoFragment : Fragment() {
 
     private lateinit var binding: FragmentTodoBinding
@@ -59,33 +60,39 @@ class AddTodoFragment : Fragment() {
 
     private var priorityMenu: PopupMenu? = null
     private val c = Calendar.getInstance()
-
-    private val viewModel: MainViewModel by activityViewModels()
+    private val viewModel: AddTodoViewModel by viewModels {
+        (requireActivity().application as TodoApplication).applicationComponent.viewModelFactory()
+    }
 
     private lateinit var _taskID: String
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as TodoApplication)
+            .applicationComponent
+            .addTodoItemComponent()
+            .create()
+            .inject(this)
+    }
+
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
 
         val view = ComposeView(requireContext())
         view.apply {
             setContent {
-               var mainText = remember {mutableStateOf("")}
+                var mainText = remember { mutableStateOf("") }
                 val checkedState = remember { mutableStateOf(false) }
                 Column(
-                    modifier = Modifier.padding(5.dp,30.dp ),
+                    modifier = Modifier.padding(5.dp, 30.dp),
                 ) {
-                    Row() {
+                    Row {
                         ImgClose()
                         SaveBtn(mainText)
-
                     }
-
                     MainCard(mainText)
-                    Text(text = "Важность", style = TextStyle( fontSize = 16.sp,))
+                    Text(text = "Важность", style = TextStyle(fontSize = 16.sp))
                     Text(text = "Нет")
                     Spacer(modifier = Modifier.height(30.dp))
                     Divider(color = Color.Black)
@@ -95,24 +102,23 @@ class AddTodoFragment : Fragment() {
                         Column(
                             modifier = Modifier,
                         ) {
-                            Text(text = "Сделать до", style = TextStyle( fontSize = 16.sp,))
+                            Text(text = "Сделать до", style = TextStyle(fontSize = 16.sp))
                             Text(text = "")
                         }
-                    Checkbox(checked = checkedState.value, onCheckedChange = { checkedState.value = it })
+                        Checkbox(checked = checkedState.value,
+                            onCheckedChange = { checkedState.value = it })
                     }
-
-
                     Spacer(modifier = Modifier.height(30.dp))
                     Divider(color = Color.Black)
                     Spacer(modifier = Modifier.height(30.dp))
                     Row(modifier = Modifier, horizontalArrangement = Arrangement.SpaceBetween) {
                         ImgDelete()
-                        Text(text="Удалить",color = Color.Red)
+                        Text(text = "Удалить", color = Color.Red)
                     }
                 }
-
             }
         }
+
         todoItem = TodoItem(
             id = c.timeInMillis.toString(),
             msg = "",
@@ -151,8 +157,7 @@ class AddTodoFragment : Fragment() {
     @Composable
     fun ImgClose() {
         Image(
-            painter = painterResource(id = R.drawable.ic_close),
-            contentDescription = "image",
+            painter = painterResource(id = R.drawable.ic_close), contentDescription = "image",
 
             modifier = Modifier
                 .padding(5.dp)
@@ -160,11 +165,11 @@ class AddTodoFragment : Fragment() {
 
         )
     }
+
     @Composable
     fun ImgDelete() {
         Image(
-            painter = painterResource(id = R.drawable.ic_delete),
-            contentDescription = "image",
+            painter = painterResource(id = R.drawable.ic_delete), contentDescription = "image",
 
             modifier = Modifier
                 .padding(5.dp)
@@ -175,10 +180,10 @@ class AddTodoFragment : Fragment() {
     }
 
     @Composable
-    fun SaveBtn(mainText:MutableState<String>) {
+    fun SaveBtn(mainText: MutableState<String>) {
         var text by remember { mainText }
         Button(onClick = {
-            Log.d("SaveBtn", "SaveBtn: "+todoItem.msg)
+            Log.d("SaveBtn", "SaveBtn: " + todoItem.msg)
             val uuid = UUID.randomUUID()
             todoItem.id = uuid.toString()
             todoItem.msg = text
@@ -191,28 +196,28 @@ class AddTodoFragment : Fragment() {
             } else {
                 val decorView = requireActivity().window.decorView
                 val view = decorView.findViewById(android.R.id.content) ?: decorView.rootView
-                Snackbar
-                    .make(view, "Заполните все поля", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Заполните все поля", Snackbar.LENGTH_LONG)
                     .setTextColor(requireActivity().getColor(R.color.label_primary))
-                    .setBackgroundTint(requireActivity().getColor(R.color.back_secondary))
-                    .show()
+                    .setBackgroundTint(requireActivity().getColor(R.color.back_secondary)).show()
             }
 
 
-        }, colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent))
-        {
+        }, colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent)) {
             Text(modifier = Modifier, text = "Сохранить", color = Color.Red)
         }
     }
 
     @Composable
-    fun MainCard(mainText:MutableState<String>) {
+    fun MainCard(mainText: MutableState<String>) {
+
         /*val textStyle = TextStyle(
             color = Color.LightGray,
             fontFamily = FontFamily.SansSerif,
             fontSize = 14.sp,
         )*/
-         var text by remember { mainText }
+
+
+        var text by remember { mainText }
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -223,7 +228,7 @@ class AddTodoFragment : Fragment() {
         ) {
             BasicTextField(
                 value = text,
-                    onValueChange = {
+                onValueChange = {
                     text = it
                 },
                 decorationBox = { innerTextField ->
@@ -241,14 +246,14 @@ class AddTodoFragment : Fragment() {
                     }
                 },
 
-            )
+                )
 
 
         }
 
     }
 
-   /* private fun setupListeners() {
+    private fun setupListeners() {
         with(binding) {
             ivBack.setOnClickListener {
                 findNavController().popBackStack()
@@ -284,15 +289,14 @@ class AddTodoFragment : Fragment() {
                 } else {
                     val decorView = requireActivity().window.decorView
                     val view = decorView.findViewById(android.R.id.content) ?: decorView.rootView
-                    Snackbar
-                        .make(view, "Заполните все поля", Snackbar.LENGTH_LONG)
+                    Snackbar.make(view, "Заполните все поля", Snackbar.LENGTH_LONG)
                         .setTextColor(requireActivity().getColor(R.color.label_primary))
                         .setBackgroundTint(requireActivity().getColor(R.color.back_secondary))
                         .show()
                 }
             }
         }
-    }*/
+    }
 
     private fun openDatePicker() {
         if (todoItem.deadline != null) {
@@ -304,13 +308,12 @@ class AddTodoFragment : Fragment() {
         val month = c.get(Calendar.MONTH)
         val day = c.get(Calendar.DAY_OF_MONTH)
 
-        val datePickerDialog =
-            DatePickerDialog(requireContext(), { _, y, m, d ->
-                val calendar = Calendar.getInstance()
-                calendar.set(y, m, d)
-                setupDate(calendar.time)
-                todoItem.deadline = calendar.time
-            }, year, month, day)
+        val datePickerDialog = DatePickerDialog(requireContext(), { _, y, m, d ->
+            val calendar = Calendar.getInstance()
+            calendar.set(y, m, d)
+            setupDate(calendar.time)
+            todoItem.deadline = calendar.time
+        }, year, month, day)
 
         datePickerDialog.show()
     }
@@ -344,10 +347,10 @@ class AddTodoFragment : Fragment() {
             return@setOnMenuItemClickListener true
         }
     }
+
     private fun setupDate(date: Date?) {
         val c = Calendar.getInstance()
-        if (date != null)
-            c.time = date
+        if (date != null) c.time = date
 
         val year = c.get(Calendar.YEAR)
         val month = c.get(Calendar.MONTH) + 1

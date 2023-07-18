@@ -1,4 +1,4 @@
-package com.example.todoapp
+package com.example.todoapp.ui.adapters
 
 import android.content.res.Resources
 import android.graphics.Paint
@@ -7,11 +7,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
+import com.example.todoapp.ItemPriority
+import com.example.todoapp.R
+import com.example.todoapp.TodoItem
+import com.example.todoapp.ui.rv.TodoItemDiffCallback
+import com.example.todoapp.ui.rv.TodoItemViewHolder
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.textview.MaterialTextView
 import com.example.todoapp.databinding.ItemTodoBinding
 import java.util.*
+import javax.inject.Singleton
 
+@Singleton
 class TodoListAdapter : ListAdapter<TodoItem, TodoItemViewHolder>(TodoItemDiffCallback()) {
 
     fun submit(list:  List<TodoItem>) {
@@ -80,7 +87,7 @@ class TodoListAdapter : ListAdapter<TodoItem, TodoItemViewHolder>(TodoItemDiffCa
 
 
             if (item.isCompleted){ // Состояние чекбокса
-               setTodoCompleted(checkboxDone, tvMsg, root.resources)
+                setTodoCompleted(checkboxDone, tvMsg, root.resources)
 
             }else{
                 setTodoNotCompleted(checkboxDone, item, tvMsg, root.resources)
@@ -118,7 +125,7 @@ class TodoListAdapter : ListAdapter<TodoItem, TodoItemViewHolder>(TodoItemDiffCa
 
         box.isErrorShown = item.priority == ItemPriority.URGENT
 
-         tv.setTextAppearance(R.style.TextViewR)
+        tv.setTextAppearance(R.style.TextViewR)
 
 
         tv.paintFlags = 0

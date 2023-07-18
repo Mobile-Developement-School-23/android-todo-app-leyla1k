@@ -1,11 +1,9 @@
-package com.example.todoapp.ui
+package com.example.todoapp.ui.fragments
 
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,45 +13,52 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.PopupMenu
 
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.todoapp.AlarmReceiver
-import com.example.todoapp.MainViewModel
+import com.example.todoapp.ui.viewmodels.MainViewModel
 import com.example.todoapp.R
 import com.example.todoapp.TodoApplication
-import com.example.todoapp.TodoItem
-import com.example.todoapp.TodoListAdapter
 import com.google.android.material.transition.MaterialSharedAxis
 import com.tsuryo.swipeablerv.SwipeLeftRightCallback
 import com.example.todoapp.databinding.FragmentMainBinding
-import com.example.todoapp.localbase.ViewModelFactory
 import com.example.todoapp.network.InternetConnectionWatcher
+import com.example.todoapp.network.TodoApi
+import com.example.todoapp.shared.Constants.KEY_THEME
+import com.example.todoapp.shared.Constants.PREFS_NAME
+import com.example.todoapp.shared.Constants.THEME_DARK
+import com.example.todoapp.shared.Constants.THEME_LIGHT
+import com.example.todoapp.shared.Constants.THEME_UNDEFINED
+import com.example.todoapp.ui.adapters.TodoListAdapter
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import java.util.Calendar
+import javax.inject.Inject
 
-
-
-const val PREFS_NAME = "theme_prefs"
-const val KEY_THEME = "prefs.theme"
-const val THEME_UNDEFINED = -1
-const val THEME_LIGHT = 0
-const val THEME_DARK = 1
 
 class MainFragment : Fragment() {
 
     private lateinit var binding: FragmentMainBinding
     private val todoListAdapter = TodoListAdapter()
-    val viewModel: MainViewModel by activityViewModels {
-        ViewModelFactory((requireActivity().application as TodoApplication).todoListRepositoryImpl, requireActivity().application)
+
+    private val viewModel: MainViewModel by viewModels {
+        (requireActivity().application as TodoApplication).applicationComponent.viewModelFactory()
     }
+
+    @Inject
+    lateinit var todoApi: TodoApi
     private var popupMenuSettings: PopupMenu? = null
     private val sharedPrefs by lazy {   activity?.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }
 
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as TodoApplication).applicationComponent.inject(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +67,7 @@ class MainFragment : Fragment() {
 
         val intent = Intent(requireActivity(), AlarmReceiver::class.java)
 
-        val pendingIntent = PendingIntent.getBroadcast(requireActivity(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntent = PendingIntent.getBroadcast(requireActivity(), 0, intent, PendingIntent.FLAG_IMMUTABLE)
         val calendar = Calendar.getInstance()
         //val next=  calendar.get(Calendar.HOUR_OF_DAY)
         calendar.timeInMillis = System.currentTimeMillis()
@@ -87,16 +92,16 @@ class MainFragment : Fragment() {
         binding = FragmentMainBinding.inflate(inflater, container, false)
         initTheme()
         setupMenu()
-       /* binding.fabAddTodo.setOnClickListener {
-            findNavController().navigate(
-                MainFragmentDirections.actionAddTodo()
-            )
-        }
-        binding.cardAddNew.setOnClickListener {
-            findNavController().navigate(
-                com.example.todoapp.ui.MainFragmentDirections.actionAddTodo()
-            )
-        }*/
+        /* binding.fabAddTodo.setOnClickListener {
+             findNavController().navigate(
+                 MainFragmentDirections.actionAddTodo()
+             )
+         }
+         binding.cardAddNew.setOnClickListener {
+             findNavController().navigate(
+                 com.example.todoapp.ui.MainFragmentDirections.actionAddTodo()
+             )
+         }*/
         binding.btnSettings.setOnClickListener {
             popupMenuSettings?.show()
         }
@@ -133,38 +138,6 @@ class MainFragment : Fragment() {
             THEME_DARK -> setTheme(AppCompatDelegate.MODE_NIGHT_YES, THEME_DARK)
         }
     }
-
-/*    private fun sendNotification(result: TodoItem) {
-        if (result.deadline == null) return
-        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager?
-        val alarmIntent = Intent(requireContext(), AlarmReceiver::class.java).let { intent ->
-            intent.putExtra(AlarmReceiver.TITLE, result.text)
-            intent.putExtra(AlarmReceiver.IMPORTANCE, result.importance.toString())
-            PendingIntent.getBroadcast(requireContext(), result.id.toInt(), intent, PendingIntent.FLAG_IMMUTABLE)
-        }
-        val calendar = Calendar.getInstance().apply {
-            timeInMillis = result.deadline
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-        }
-
-        alarmManager?.setExact(
-            AlarmManager.RTC_WAKEUP,
-            calendar.timeInMillis,
-            alarmIntent
-        )
-    }
-
-    private fun deleteNotification(result: TodoItem) {
-        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager?
-        val alarmIntent = Intent(requireContext(), AlarmReceiver::class.java)
-        val pendingIntent = PendingIntent
-            .getBroadcast(requireContext(), result.id.toInt(), alarmIntent, PendingIntent.FLAG_IMMUTABLE)
-        pendingIntent?.let {
-            alarmManager?.cancel(it)
-            it.cancel()
-        }
-    }*/
     private fun saveTheme(theme: Int) = sharedPrefs!!.edit().putInt(KEY_THEME, theme).apply()
     private fun setTheme(themeMode: Int, prefsMode: Int) {
         AppCompatDelegate.setDefaultNightMode(themeMode)
@@ -230,19 +203,51 @@ class MainFragment : Fragment() {
 
             setListener(object : SwipeLeftRightCallback.Listener {
                 override fun onSwipedRight(position: Int) {
-                      viewModel.changeDoneState(todoListAdapter.currentList[position])
+                    viewModel.changeDoneState(todoListAdapter.currentList[position])
                 }
                 override fun onSwipedLeft(position: Int) {
-                     viewModel.deleteTodoItem(todoListAdapter.currentList[position],position)
+                    viewModel.deleteTodoItem(todoListAdapter.currentList[position],position)
                 }
             })
         }
+
         todoListAdapter.onTodoItemClickListener = {
             findNavController().navigate(
-               MainFragmentDirections.actionEditTodo(
+                MainFragmentDirections.actionEditTodo(
                     it.id
                 )
             )
         }
     }
+    /*    private fun sendNotification(result: TodoItem) {
+        if (result.deadline == null) return
+        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager?
+        val alarmIntent = Intent(requireContext(), AlarmReceiver::class.java).let { intent ->
+            intent.putExtra(AlarmReceiver.TITLE, result.text)
+            intent.putExtra(AlarmReceiver.IMPORTANCE, result.importance.toString())
+            PendingIntent.getBroadcast(requireContext(), result.id.toInt(), intent, PendingIntent.FLAG_IMMUTABLE)
+        }
+        val calendar = Calendar.getInstance().apply {
+            timeInMillis = result.deadline
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+        }
+
+        alarmManager?.setExact(
+            AlarmManager.RTC_WAKEUP,
+            calendar.timeInMillis,
+            alarmIntent
+        )
+    }
+
+    private fun deleteNotification(result: TodoItem) {
+        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager?
+        val alarmIntent = Intent(requireContext(), AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent
+            .getBroadcast(requireContext(), result.id.toInt(), alarmIntent, PendingIntent.FLAG_IMMUTABLE)
+        pendingIntent?.let {
+            alarmManager?.cancel(it)
+            it.cancel()
+        }
+    }*/
 }

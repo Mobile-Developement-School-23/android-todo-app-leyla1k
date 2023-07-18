@@ -1,4 +1,4 @@
-package com.example.todoapp.retrofit
+package com.example.todoapp.network
 
 import com.example.todoapp.network.*
 import retrofit2.Response

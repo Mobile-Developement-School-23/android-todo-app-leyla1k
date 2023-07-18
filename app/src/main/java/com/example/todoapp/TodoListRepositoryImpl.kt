@@ -1,27 +1,34 @@
 package com.example.todoapp
 
 import android.util.Log
-import com.example.todoapp.localbase.DbRevision
-import com.example.todoapp.localbase.TodoDataItem
-import com.example.todoapp.localbase.TodoItemDao
-import com.example.todoapp.localbase.toDbModel
+import com.example.todoapp.storage.localbase.DbRevision
+import com.example.todoapp.storage.localbase.TodoDataItem
+import com.example.todoapp.storage.localbase.TodoItemDao
+import com.example.todoapp.storage.localbase.toDbModel
 
-import com.example.todoapp.localbase.toListOfToDoEntyty
-import com.example.todoapp.localbase.toTodoItem
+import com.example.todoapp.storage.localbase.toListOfToDoEntyty
+import com.example.todoapp.storage.localbase.toTodoItem
 import com.example.todoapp.network.TodoListRequestDto
 import com.example.todoapp.network.TodoListResponseDto
 import com.example.todoapp.network.mapDtoToTodoItem
 import com.example.todoapp.network.mapTodoItemToItemRequestDto
 import com.example.todoapp.network.mapListDtoToTodoItemList
 import com.example.todoapp.network.mapTodoItemToDto
-import com.example.todoapp.retrofit.TodoApi
+import com.example.todoapp.network.TodoApi
+import com.example.todoapp.shared.Constants
+import com.example.todoapp.storage.repository.TodoListRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withContext
 import java.util.*
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class TodoListRepositoryImpl(private val dao: TodoItemDao, private val todoApi: TodoApi) :
-    TodoListRepository {
+@Singleton
+class TodoListRepositoryImpl @Inject constructor(
+    private val dao: TodoItemDao,
+    private val todoApi: TodoApi
+) : TodoListRepository {
     override suspend fun refreshData() {
         withContext(Dispatchers.IO) {
             val request = todoApi.getServerResponse()
@@ -45,6 +52,10 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao, private val todoApi: 
                 todoApi.updateServerFromDb(request.revision, currentRequest)
             }
         }
+    }
+
+    override suspend fun getItemByID(id: String): TodoItem {
+        return dao.getTodoItem(id).toTodoItem()
     }
     override suspend fun createRevision() {
         try {
@@ -197,7 +208,7 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao, private val todoApi: 
     }
     override suspend fun deleteTodoItem(item: TodoItem, stringId: String) {
         withContext(Dispatchers.IO) {
-        dao.deleteTodoItem(stringId)
+            dao.deleteTodoItem(stringId)
         }
     }
     override suspend fun deleteTodoItemWithoutPosition(item: TodoItem) {

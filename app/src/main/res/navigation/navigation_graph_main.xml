@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/fragmentMain"
-        android:name="com.example.todoapp.ui.MainFragment"
+        android:name="com.example.todoapp.ui.fragments.MainFragment"
         android:label="FragmentMain"
         tools:layout="@layout/fragment_main">
 
@@ -34,13 +34,13 @@
 
     <fragment
         android:id="@+id/fragmentAddTodo"
-        android:name="com.example.todoapp.ui.AddTodoFragment"
+        android:name="com.example.todoapp.ui.fragments.AddTodoFragment"
         android:label="FragmentAddTodo"
         tools:layout="@layout/fragment_todo"/>
 
     <fragment
         android:id="@+id/fragmentEditTodo"
-        android:name="com.example.todoapp.ui.EditTodoFragment"
+        android:name="com.example.todoapp.ui.fragments.EditTodoFragment"
         android:label="FragmentEditTodo"
         tools:layout="@layout/fragment_todo">
         <argument

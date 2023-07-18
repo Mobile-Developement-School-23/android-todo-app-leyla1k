@@ -9,14 +9,19 @@ import android.content.Context;
 
 import androidx.work.WorkerParameters;
 import com.example.todoapp.TodoListRepositoryImpl
+import com.example.todoapp.storage.repository.TodoListRepository
+import javax.inject.Inject
 
 private const val TAG = "SynchronizeWorker"
 
-class SynchronizeWorker(ctx:Context, params:WorkerParameters) : CoroutineWorker(ctx, params) {
+class SynchronizeWorker @Inject constructor(
+    ctx:Context,
+    params:WorkerParameters,
+    private val repo: TodoListRepository
+) : CoroutineWorker(ctx, params) {
 
     override suspend fun doWork(): Result {
         return try {
-            val repo = TodoApplication.getInstance().todoListRepositoryImpl
             repo.refreshData()
             Result.success()
         } catch (throwable: Throwable) {

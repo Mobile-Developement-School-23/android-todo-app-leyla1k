@@ -1,93 +1,106 @@
-package com.example.todoapp.ui
-
+package com.example.todoapp.ui.fragments
 import android.app.DatePickerDialog
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.todoapp.ItemPriority
-import com.example.todoapp.MainViewModel
 import com.example.todoapp.R
+import com.example.todoapp.TodoApplication
 import com.example.todoapp.TodoItem
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.transition.MaterialSharedAxis
 import com.example.todoapp.databinding.FragmentTodoBinding
-import java.util.*
+import com.example.todoapp.di.TodoScope
+import com.example.todoapp.ui.fragments.EditTodoFragmentArgs
+import com.example.todoapp.ui.viewmodels.EditTodoViewModel
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
+import java.util.Calendar
+import java.util.Date
 
+@TodoScope
 class EditTodoFragment : Fragment() {
-
     private lateinit var binding: FragmentTodoBinding
-    private lateinit var viewModel: MainViewModel
-    private val todoId by lazy { navArgs<com.example.todoapp.ui.EditTodoFragmentArgs>().value.todoId }
+
+    private val viewModel: EditTodoViewModel by viewModels {
+        (requireActivity().application as TodoApplication).applicationComponent.viewModelFactory()
+    }
+
+    private val todoId by lazy { navArgs<EditTodoFragmentArgs>().value.todoId }
     private val c = Calendar.getInstance()
     private var priorityMenu: PopupMenu? = null
-
     private lateinit var todoItem: TodoItem
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as TodoApplication)
+            .applicationComponent
+            .editTodoItemComponent()
+            .create()
+            .inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-       /* enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
-        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)*/
-
         binding = FragmentTodoBinding.inflate(inflater, container, false)
-        viewModel = ViewModelProvider(requireActivity()) [MainViewModel::class.java]
 
-        todoItem = viewModel.getTodoItem(todoId)
 
         init()
         setupMenu()
         setupListeners()
-
         return binding.root
     }
-
-
-    private fun init(){///////поправить для темы
-        with(binding){
-            tvMsg.setText(todoItem.msg)
-
-            when(todoItem.priority){
-                ItemPriority.LOW -> {
-                    binding.tvPriority.setTextColor(requireActivity().getColor(R.color.label_tertiary))
-                    binding.tvPriority.text = "Низкий"
+    private fun init(){
+        viewLifecycleOwner.lifecycleScope.launch {
+            Log.d("Edit item id", todoId)
+            todoItem = viewModel.getTodoItem(id = todoId)
+            with(binding){
+                tvMsg.setText(todoItem.msg)
+                when(todoItem.priority){
+                    ItemPriority.LOW -> {
+                        binding.tvPriority.setTextColor(requireActivity().getColor(R.color.label_tertiary))
+                        binding.tvPriority.text = "Низкий"
+                    }
+                    ItemPriority.URGENT -> {
+                        binding.tvPriority.setTextColor(requireActivity().getColor(R.color.red))
+                        binding.tvPriority.text = "!! Высокий"
+                    }
+                    else -> {
+                        binding.tvPriority.setTextColor(requireActivity().getColor(R.color.label_tertiary))
+                        binding.tvPriority.text = "Нет"
+                    }
                 }
-                ItemPriority.URGENT -> {
-                    binding.tvPriority.setTextColor(requireActivity().getColor(R.color.red))
-                    binding.tvPriority.text = "!! Высокий"
+
+                if (todoItem.deadline != null) {
+                    switchDeadline.isChecked = true
+                    tvDeadline.visibility = View.VISIBLE
+
+                    setupDate(todoItem.deadline!!)
+                }else{
+                    switchDeadline.isChecked = false
+                    tvDeadline.visibility = View.INVISIBLE
+                    setupDate(null)
                 }
-                else -> {
-                    binding.tvPriority.setTextColor(requireActivity().getColor(R.color.label_tertiary))
-                    binding.tvPriority.text = "Нет"
-                }
+
+                ivDelete
+                    .setColorFilter(
+                        ContextCompat.getColor(requireContext(), R.color.red),
+                        android.graphics.PorterDuff.Mode.MULTIPLY
+                    )
+
+                tvDelete.setTextColor(requireActivity().getColor(R.color.red))
             }
-
-            if (todoItem.deadline != null) {
-                switchDeadline.isChecked = true
-                tvDeadline.visibility = View.VISIBLE
-
-                setupDate(todoItem.deadline!!)
-            }else{
-                switchDeadline.isChecked = false
-                tvDeadline.visibility = View.INVISIBLE
-                setupDate(null)
-            }
-
-            ivDelete
-                .setColorFilter(
-                    ContextCompat.getColor(requireContext(), R.color.red),
-                    android.graphics.PorterDuff.Mode.MULTIPLY
-                )
-
-            tvDelete.setTextColor(requireActivity().getColor(R.color.red))
         }
     }
 

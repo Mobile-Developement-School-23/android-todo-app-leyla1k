@@ -1,4 +1,4 @@
-package com.example.todoapp.ui
+package com.example.todoapp.ui.activities
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -9,7 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.todoapp.AlarmReceiver
 import com.example.todoapp.R
 import java.util.Calendar
+import javax.inject.Singleton
 
+@Singleton
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

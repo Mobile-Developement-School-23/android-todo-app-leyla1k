@@ -1,6 +1,6 @@
-package com.example.todoapp
+package com.example.todoapp.storage.repository
 
-import android.content.Context
+import com.example.todoapp.TodoItem
 import com.example.todoapp.network.TodoListRequestDto
 import kotlinx.coroutines.flow.Flow
 
@@ -30,4 +30,5 @@ interface TodoListRepository {
     suspend fun addTodoItemToInternet(item: TodoItem)
     suspend fun updateListFromInternet(revision: Int, body: TodoListRequestDto)
     suspend fun editTodoItemToInternet(newItem: TodoItem)
+    suspend fun getItemByID(id: String): TodoItem
 }

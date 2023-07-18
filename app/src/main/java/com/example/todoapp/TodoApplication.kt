@@ -2,8 +2,10 @@ package com.example.todoapp
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.todoapp.localbase.MainDb
-import com.example.todoapp.retrofit.TodoApi
+import com.example.todoapp.di.ApplicationComponent
+import com.example.todoapp.di.DaggerApplicationComponent
+import com.example.todoapp.storage.localbase.MainDb
+import com.example.todoapp.network.TodoApi
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -11,13 +13,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class TodoApplication: Application() {
-    private val database by lazy { MainDb.getDb(this) }
-    val todoListRepositoryImpl by lazy{TodoListRepositoryImpl(database.getDao(), todoApi)}
-
-
     private val retrofit by lazy {Retrofit.Builder().client(client).baseUrl("https://beta.mrdekk.ru/todobackend/")
         .addConverterFactory(GsonConverterFactory.create()).build()}
-    val todoApi by lazy { retrofit.create(TodoApi::class.java)}
 
     val client: OkHttpClient = OkHttpClient.Builder().addInterceptor(Interceptor { chain ->
         val newRequest: Request = chain.request().newBuilder()
@@ -26,9 +23,14 @@ class TodoApplication: Application() {
         chain.proceed(newRequest)
     }).build()
 
+    val applicationComponent: ApplicationComponent by lazy {
+        DaggerApplicationComponent.factory().create(//а тут супа пупа
+            application = this,
+            context = applicationContext,
+            retrofit = retrofit)
+    }
+
     companion object {
-        const val CHANNEL_ID = "TodoList"
-        const val CHANNEL_NAME = "TodoListChannel"
 
         @Volatile
         private var instance: TodoApplication? = null
@@ -42,8 +44,6 @@ class TodoApplication: Application() {
     override fun onCreate() {
         super.onCreate()
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.getDefaultNightMode())
-
     }
-
 
 }

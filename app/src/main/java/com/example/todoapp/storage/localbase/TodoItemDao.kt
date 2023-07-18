@@ -1,4 +1,4 @@
-package com.example.todoapp.localbase
+package com.example.todoapp.storage.localbase
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -28,12 +28,15 @@ interface TodoItemDao {
     @Query("DELETE FROM items WHERE id=:TodoItemId")
     suspend fun deleteTodoItem(TodoItemId: String)
 
+    @Query("SELECT * FROM items WHERE id = :id")
+    suspend fun getTodoItem(id: String): TodoDataItem
+
 
     @Update
     suspend fun updateTodoItem(note: TodoDataItem)
 
     @Query("SELECT * FROM items")
-    suspend fun getTodoItem():TodoDataItem
+    suspend fun getTodoItem(): TodoDataItem
 
 
     @Query("SELECT * from revision WHERE id = :id")

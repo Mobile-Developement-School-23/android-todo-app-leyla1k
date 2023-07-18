@@ -1,4 +1,4 @@
-package com.example.todoapp.localbase
+package com.example.todoapp.storage.localbase
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

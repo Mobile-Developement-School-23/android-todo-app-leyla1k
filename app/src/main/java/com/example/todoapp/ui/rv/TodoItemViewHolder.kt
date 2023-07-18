@@ -1,4 +1,4 @@
-package com.example.todoapp
+package com.example.todoapp.ui.rv
 
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.databinding.ItemTodoBinding
