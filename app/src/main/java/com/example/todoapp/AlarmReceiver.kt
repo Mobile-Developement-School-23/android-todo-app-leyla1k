@@ -11,42 +11,44 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.example.todoapp.R
 import okhttp3.internal.notify
 
 
-class AlarmReceiver /*: BroadcastReceiver()*/ {
+class AlarmReceiver : BroadcastReceiver() {
 
-   /* override fun onReceive(context: Context?, intent: Intent?) {
+    override fun onReceive(context: Context, intent: Intent) {
+      /*  val text = intent.getStringExtra(TITLE)
+        val importance = intent.getStringExtra(IMPORTANCE)
+        if (text != null && importance != null) {
+            notification(context, text, importance)
+        }*/
+    }
+/*
+    private fun notification(context: Context, text : String, importance: String) {
+        val notificationManager =
+            ContextCompat.getSystemService(context, NotificationManager::class.java)
+        val importanceNew = customImportance(context, importance)
+        val notification = NotificationCompat.Builder(context, TodoApplication.CHANNEL_ID)
+            .setContentTitle(context.getString(R.string.title_text) + " " + importanceNew.lowercase())
+            .setContentText(text)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .build()
+        notificationManager?.notify(1, notification)
+    }
 
-       *//* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-
-            // Create the NotificationChannel
-            val name = "Alarme"
-            val descriptionText = "Detalhes do Alarme"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val mChannel = NotificationChannel("AlarmId", name, importance)
-            mChannel.description = descriptionText
-            val notificationManager =
-                context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(mChannel)
+    private fun customImportance(context: Context, importance: String): String {
+        return when (importance) {
+            "BASIC" -> context.getString(R.string.importance_basic)
+            "IMPORTANT" -> context.getString(R.string.importance_high)
+            "LOW" -> context.getString(R.string.importance_low)
+            else -> context.getString(R.string.importance_basic)
         }
+    }
 
-        // Create the notification to be shown
-        val mBuilder = NotificationCompat.Builder(context!!, "AlarmId")
-            .setSmallIcon(R.drawable.ic_close)
-            .setContentTitle("Name")
-            .setContentText("Priority")
-            .setAutoCancel(true)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-
-        // Get the Notification manager service
-        val am = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        // Generate an Id for each notification
-        val id = System.currentTimeMillis() / 1000
-
-        // Show a notification
-        am.notify(id.toInt(), mBuilder.build())*//*
+    companion object {
+        const val TITLE = "text"
+        const val IMPORTANCE = "importance"
     }*/
 }

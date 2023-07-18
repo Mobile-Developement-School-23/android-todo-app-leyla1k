@@ -1,6 +1,9 @@
 package com.example.todoapp.ui
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
@@ -18,9 +21,11 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.todoapp.AlarmReceiver
 import com.example.todoapp.MainViewModel
 import com.example.todoapp.R
 import com.example.todoapp.TodoApplication
+import com.example.todoapp.TodoItem
 import com.example.todoapp.TodoListAdapter
 import com.google.android.material.transition.MaterialSharedAxis
 import com.tsuryo.swipeablerv.SwipeLeftRightCallback
@@ -29,6 +34,9 @@ import com.example.todoapp.localbase.ViewModelFactory
 import com.example.todoapp.network.InternetConnectionWatcher
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
+import java.util.Calendar
+
+
 
 const val PREFS_NAME = "theme_prefs"
 const val KEY_THEME = "prefs.theme"
@@ -39,7 +47,6 @@ const val THEME_DARK = 1
 class MainFragment : Fragment() {
 
     private lateinit var binding: FragmentMainBinding
-
     private val todoListAdapter = TodoListAdapter()
     val viewModel: MainViewModel by activityViewModels {
         ViewModelFactory((requireActivity().application as TodoApplication).todoListRepositoryImpl, requireActivity().application)
@@ -48,6 +55,28 @@ class MainFragment : Fragment() {
     private val sharedPrefs by lazy {   activity?.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }
 
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val alarmManager = requireActivity().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        val intent = Intent(requireActivity(), AlarmReceiver::class.java)
+
+        val pendingIntent = PendingIntent.getBroadcast(requireActivity(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val calendar = Calendar.getInstance()
+        //val next=  calendar.get(Calendar.HOUR_OF_DAY)
+        calendar.timeInMillis = System.currentTimeMillis()
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND,  0)
+        // Starts the alarm manager
+        alarmManager.setRepeating(
+            AlarmManager.RTC_WAKEUP,
+            calendar.timeInMillis,
+            AlarmManager.INTERVAL_DAY,
+            pendingIntent
+        )
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -55,27 +84,19 @@ class MainFragment : Fragment() {
     ): View {
         enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
         returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
-
         binding = FragmentMainBinding.inflate(inflater, container, false)
-
-
-
         initTheme()
-
         setupMenu()
-
        /* binding.fabAddTodo.setOnClickListener {
             findNavController().navigate(
                 MainFragmentDirections.actionAddTodo()
             )
         }
-
         binding.cardAddNew.setOnClickListener {
             findNavController().navigate(
                 com.example.todoapp.ui.MainFragmentDirections.actionAddTodo()
             )
         }*/
-
         binding.btnSettings.setOnClickListener {
             popupMenuSettings?.show()
         }
@@ -90,9 +111,6 @@ class MainFragment : Fragment() {
             }
         }
         setupRecyclerView()
-
-
-
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.countOfDoneFlow.flowWithLifecycle(
                 viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED).collect {
@@ -102,36 +120,51 @@ class MainFragment : Fragment() {
                 binding.tvDone.text = str
             }
         }
-
-
-
         viewModel.eventNetworkError.observe(viewLifecycleOwner) { isNetworkError ->
             if (isNetworkError)
                 onNetworkError()
         }
-
         return binding.root
     }
-
-
-
-
     private fun getSavedTheme() = sharedPrefs!!.getInt(KEY_THEME, THEME_UNDEFINED)
     private fun initTheme() {
-
         when (getSavedTheme()) {
             THEME_LIGHT ->  setTheme(AppCompatDelegate.MODE_NIGHT_NO, THEME_LIGHT)
             THEME_DARK -> setTheme(AppCompatDelegate.MODE_NIGHT_YES, THEME_DARK)
-
-            /*THEME_UNDEFINED -> {
-                when (resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK)) {
-                   *//* Configuration.UI_MODE_NIGHT_NO -> themeLight.isChecked = true
-                    Configuration.UI_MODE_NIGHT_YES -> themeDark.isChecked = true
-                    Configuration.UI_MODE_NIGHT_UNDEFINED -> themeLight.isChecked = true*//*
-                }
-            }*/
         }
     }
+
+/*    private fun sendNotification(result: TodoItem) {
+        if (result.deadline == null) return
+        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager?
+        val alarmIntent = Intent(requireContext(), AlarmReceiver::class.java).let { intent ->
+            intent.putExtra(AlarmReceiver.TITLE, result.text)
+            intent.putExtra(AlarmReceiver.IMPORTANCE, result.importance.toString())
+            PendingIntent.getBroadcast(requireContext(), result.id.toInt(), intent, PendingIntent.FLAG_IMMUTABLE)
+        }
+        val calendar = Calendar.getInstance().apply {
+            timeInMillis = result.deadline
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+        }
+
+        alarmManager?.setExact(
+            AlarmManager.RTC_WAKEUP,
+            calendar.timeInMillis,
+            alarmIntent
+        )
+    }
+
+    private fun deleteNotification(result: TodoItem) {
+        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager?
+        val alarmIntent = Intent(requireContext(), AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent
+            .getBroadcast(requireContext(), result.id.toInt(), alarmIntent, PendingIntent.FLAG_IMMUTABLE)
+        pendingIntent?.let {
+            alarmManager?.cancel(it)
+            it.cancel()
+        }
+    }*/
     private fun saveTheme(theme: Int) = sharedPrefs!!.edit().putInt(KEY_THEME, theme).apply()
     private fun setTheme(themeMode: Int, prefsMode: Int) {
         AppCompatDelegate.setDefaultNightMode(themeMode)
@@ -139,9 +172,7 @@ class MainFragment : Fragment() {
     }
     private fun setupMenu() {
         popupMenuSettings = PopupMenu(requireContext(), binding.btnSettings)
-
         popupMenuSettings!!.menuInflater.inflate(R.menu.menu_settings, popupMenuSettings!!.menu)
-
         //  надо убрать наверное
         popupMenuSettings!!.setOnMenuItemClickListener { item ->
             when (item.itemId) {
@@ -159,14 +190,11 @@ class MainFragment : Fragment() {
                     Log.d("THEMES", "setupMenu: light")
                 }
                 else -> {
-
                 }
             }
             return@setOnMenuItemClickListener true
         }
     }
-
-
     private fun onNetworkError() {
         if (!viewModel.isNetworkErrorShown.value!!) {
             val rootView = view
@@ -175,40 +203,25 @@ class MainFragment : Fragment() {
                 Snackbar.make(it, getString(R.string.network_error_message), Snackbar.LENGTH_LONG)
                     .show()
             }
-
             viewModel.onNetworkErrorShown()
         }
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
         val internetConnectionWatcher = InternetConnectionWatcher(requireContext())
         internetConnectionWatcher.setOnInternetConnectedListener(viewModel::refreshDataFromRepository)
-
-
-
-
         internetConnectionWatcher.startWatching()
         binding.fabAddTodo.setOnClickListener {
             findNavController().navigate(
                 MainFragmentDirections.actionAddTodo()
             )
         }
-
         binding.cardAddNew.setOnClickListener {
             findNavController().navigate(
                 MainFragmentDirections.actionAddTodo()
             )
         }
-
-
-
     }
-
-
-
-
     private fun setupRecyclerView() {
 
         with(binding.rvMain) {
@@ -218,19 +231,12 @@ class MainFragment : Fragment() {
             setListener(object : SwipeLeftRightCallback.Listener {
                 override fun onSwipedRight(position: Int) {
                       viewModel.changeDoneState(todoListAdapter.currentList[position])
-
-
                 }
-
                 override fun onSwipedLeft(position: Int) {
                      viewModel.deleteTodoItem(todoListAdapter.currentList[position],position)
-
-
                 }
             })
-
         }
-
         todoListAdapter.onTodoItemClickListener = {
             findNavController().navigate(
                MainFragmentDirections.actionEditTodo(
@@ -239,5 +245,4 @@ class MainFragment : Fragment() {
             )
         }
     }
-
 }

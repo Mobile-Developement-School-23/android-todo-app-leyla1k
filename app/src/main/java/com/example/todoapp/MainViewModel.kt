@@ -27,20 +27,15 @@ class MainViewModel(
     private val _countOfDoneFlow = MutableStateFlow<Int>(0)
     val countOfDoneFlow: StateFlow<Int> = _countOfDoneFlow.asStateFlow()
 
-    private lateinit var getListJob: Job
+   private lateinit var getListJob: Job
 
     init {
-        getListOfNotes()
-        //recalculationOfDoneTodos()//сликом быстро идет
         viewModelScope.launch {
-
             getListOfNotes()
-
             refreshDataFromRepository()
-                todoListRepository.createRevision()
-
+            todoListRepository.createRevision()
         }
-        getListJob.cancel()
+
     }
     private val workRequest =
         PeriodicWorkRequestBuilder<SynchronizeWorker>(Constants.SYNCHRONIZE_INTERVAL_HOURS, TimeUnit.HOURS)
@@ -78,7 +73,6 @@ class MainViewModel(
        private fun recalculationOfDoneTodos() {
         var count = 0
         viewModelScope.launch {
-            delay(1500)//потом этот момент доработаю
             listOfNotesFlow.value.forEach { element ->
                 if (element.isCompleted) {
                     count += 1
@@ -86,7 +80,7 @@ class MainViewModel(
             }
             _countOfDoneFlow.value = count
             Log.d("MainViewModel", "count=" + _countOfDoneFlow.value)
-            //getListOfNotes()
+
         }
     }
     private fun getListOfNotes() {
@@ -101,7 +95,10 @@ class MainViewModel(
                     }
 
                 }
+
+                recalculationOfDoneTodos()
             }
+
         }
     }
     suspend fun <T> Flow<List<T>>.flattenToList() =
@@ -133,17 +130,19 @@ class MainViewModel(
                 onUnsuccessfulResponse()
                 Log.v("insertItem", e.message.toString())
             }
-
-            //todoListRepository.addTodoItemToInternet(item)
         }
     }
     fun changeDoneState(item: TodoItem) {// поменять!!! эдит можно тот что выше один раз сделать!
         viewModelScope.launch(Dispatchers.IO) {
             val newItem = item.copy(isCompleted = !item.isCompleted)
             todoListRepository.editTodoItem(newItem)
-            //recalculationOfDoneTodos()
-            //getListOfNotes()
-            todoListRepository.editTodoItemToInternet(newItem)
+            try {
+                todoListRepository.editTodoItemToInternet(newItem)
+                onSuccessResponse()
+            } catch (e: Exception) {
+                onUnsuccessfulResponse()
+                Log.v("editItem", e.message.toString())
+            }
         }
     }
     fun deleteTodoItem( item: TodoItem, position: Int) {
@@ -158,14 +157,17 @@ class MainViewModel(
             }
 
         }
-        //recalculationOfDoneTodos()
-        //getListOfNotes()
     }
     fun deleteTodoItemWithoutPosition(item: TodoItem) {
         viewModelScope.launch(Dispatchers.IO) {
             todoListRepository.deleteTodoItemWithoutPosition(item)
-            //getListOfNotes()
+            try {
+                todoListRepository.deleteTodoItemFromInternet(item.id)
+                onSuccessResponse()
+            } catch (e: Exception) {
+                onUnsuccessfulResponse()
+                Log.v("deleteItem", e.message.toString())
+            }
         }
-
     }
 }

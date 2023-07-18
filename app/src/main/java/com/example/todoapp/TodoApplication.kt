@@ -27,6 +27,8 @@ class TodoApplication: Application() {
     }).build()
 
     companion object {
+        const val CHANNEL_ID = "TodoList"
+        const val CHANNEL_NAME = "TodoListChannel"
 
         @Volatile
         private var instance: TodoApplication? = null
@@ -40,6 +42,8 @@ class TodoApplication: Application() {
     override fun onCreate() {
         super.onCreate()
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.getDefaultNightMode())
+
     }
+
 
 }

@@ -24,22 +24,18 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao, private val todoApi: 
     TodoListRepository {
     override suspend fun refreshData() {
         withContext(Dispatchers.IO) {
-
             val request = todoApi.getServerResponse()
-
             val localRevision = getRevision()
             Log.d("localRevision", "refreshData: " + localRevision.toString())
             if (localRevision > request.revision) {
                 updateServerFromDatabase(request)
             } else {
-
                 updateDatabaseFromServer(request)
             }
             synchronizeRevisions()
         }
     }
     private suspend fun updateServerFromDatabase(request: TodoListResponseDto) {
-
         dao.getTodoListFlow().collect { itm ->
             if (!itm.isNullOrEmpty()) {
                 val currentRequest =
@@ -64,7 +60,6 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao, private val todoApi: 
             mapDtoToTodoItem(it).toDbModel()
         }
         val itemsFromDatabase = dao.getTodoListAsList()
-
         if (itemsFromDatabase.isNullOrEmpty()) {
             itemsFromDatabase.map {
                 dao.insertTodoItem(it)
@@ -73,19 +68,14 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao, private val todoApi: 
             Log.d("DebagerBig", "updateDatabaseFromServer: ")
             mergeData(itemsFromDatabase, itemsFromServer)
         }
-
-
     }
-
-
-
     private suspend fun synchronizeRevisions() {
         withContext(Dispatchers.IO) {
             val response = todoApi.getServerResponse()
             dao.updateRevision(DbRevision(Constants.REVISION_ID, response.revision))
         }
     }
-    private suspend fun mergeData(///или мердж бесконечный или список
+    private suspend fun mergeData(
         itemsFromDatabase: List<TodoDataItem>,
         itemsFromServer: List<TodoDataItem>
     ) {
@@ -107,7 +97,6 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao, private val todoApi: 
         increaseRevision()
         dao.deleteTodoItem(item.id)
         Log.d("TAGINCR3", "!!!!!!!!!!")
-
     }
     private suspend fun updateItemToDatabase(item: TodoDataItem) {
         increaseRevision()
@@ -178,7 +167,6 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao, private val todoApi: 
         withContext(Dispatchers.IO) {
             val raw = todoApi.deleteTodoItem(getRevision(), UUID.fromString(id))
             val response = raw.body()
-
             if (response != null) {
                 updateRevisionLikeServer(response.revision)
             }
@@ -186,7 +174,6 @@ class TodoListRepositoryImpl(private val dao: TodoItemDao, private val todoApi: 
         Log.d("TodoListRepositoryImpl", "deleteTodoItemFromInternet: " + id)
     }
     override fun getTodoList(): Flow<List<TodoItem>> {
-
         val toDoItemList = dao.getTodoListFlow()
         val convertedToDoItemList = toDoItemList.map {
             println("DEBAG2 +${it.size}")
