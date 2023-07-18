@@ -23,6 +23,7 @@ import com.example.todoapp.AlarmReceiver
 import com.example.todoapp.ui.viewmodels.MainViewModel
 import com.example.todoapp.R
 import com.example.todoapp.TodoApplication
+import com.example.todoapp.TodoItem
 import com.google.android.material.transition.MaterialSharedAxis
 import com.tsuryo.swipeablerv.SwipeLeftRightCallback
 import com.example.todoapp.databinding.FragmentMainBinding
@@ -34,6 +35,7 @@ import com.example.todoapp.shared.Constants.THEME_DARK
 import com.example.todoapp.shared.Constants.THEME_LIGHT
 import com.example.todoapp.shared.Constants.THEME_UNDEFINED
 import com.example.todoapp.ui.adapters.TodoListAdapter
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -105,6 +107,10 @@ class MainFragment : Fragment() {
         binding.btnSettings.setOnClickListener {
             popupMenuSettings?.show()
         }
+
+
+
+
         Log.d("SAVING", "SaveBtn:1 ")
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.listOfNotesFlow.flowWithLifecycle(
@@ -120,7 +126,6 @@ class MainFragment : Fragment() {
             viewModel.countOfDoneFlow.flowWithLifecycle(
                 viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED).collect {
                 val str ="Выполнено - "+ viewModel.countOfDoneFlow.value.toString()
-                //binding.tvDone.text = getString(R.string.todo_done , it ?: 0)
                 Log.d("MainFragment", "str = " + str)
                 binding.tvDone.text = str
             }
@@ -208,7 +213,10 @@ class MainFragment : Fragment() {
                 override fun onSwipedLeft(position: Int) {
                     viewModel.deleteTodoItem(todoListAdapter.currentList[position],position)
                 }
-            })
+
+            }
+
+            )
         }
 
         todoListAdapter.onTodoItemClickListener = {
@@ -218,7 +226,18 @@ class MainFragment : Fragment() {
                 )
             )
         }
+        todoListAdapter.onCheckBoxClickListener = {
+              viewModel.changeDoneState(it)
+
+        }
+
+
+
+
+
     }
+
+
     /*    private fun sendNotification(result: TodoItem) {
         if (result.deadline == null) return
         val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager?

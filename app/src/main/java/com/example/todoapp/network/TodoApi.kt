@@ -16,10 +16,10 @@ interface TodoApi {
 
 
 
-    @GET("https://beta.mrdekk.ru/todobackend/list/{id}")//<>?????
+    @GET("list/{id}")
     suspend fun getTodoById(@Path("id") id:String): TodoItemModel
 
-   @GET ("https://beta.mrdekk.ru/todobackend/list")
+   @GET ("list")
    suspend fun rev(@Header("X-Last-Known-Revision") revision: Int)
 
 
@@ -37,16 +37,16 @@ interface TodoApi {
     ): Response<TodoItemResponseDto>
 
 
-    @GET("https://beta.mrdekk.ru/todobackend/list")
+    @GET("list")
     suspend fun downloadTodoList(): Response<TodoListResponseDto>
 
 //пока не юзаю
-    @PATCH("https://beta.mrdekk.ru/todobackend/list")
+    @PATCH("list")
     suspend fun updateServerFromDb(@Header("X-Last-Known-Revision") revision: Int,
                                    @Body body: TodoListRequestDto
     ): Response<TodoListResponseDto>
 
-    @POST("https://beta.mrdekk.ru/todobackend/list")
+    @POST("list")
     suspend fun loadTodoItem(@Header("X-Last-Known-Revision") revision: Int, @Body body:TodoItemRequestDto)
     : Response<TodoItemResponseDto>
 

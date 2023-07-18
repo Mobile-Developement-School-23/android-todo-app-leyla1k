@@ -32,9 +32,12 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            Log.d("viemodel", "init viemodel: ")
+
             getListOfNotes()
             refreshDataFromRepository()
             todoListRepository.createRevision()
+
         }
 
     }
@@ -59,11 +62,11 @@ class MainViewModel @Inject constructor(
 
     fun refreshDataFromRepository() {
         viewModelScope.launch {
-            Log.d("localRevision", "refreshData: иду")
+            Log.d("seeeee", "refreshData: иду")
             try {
                 todoListRepository.refreshData()
                 onSuccessResponse()
-                Log.d("localRevision", "refreshData: иду")
+
             } catch (networkError: IOException) {
                 onUnsuccessfulResponse()
             }
@@ -96,6 +99,7 @@ class MainViewModel @Inject constructor(
 
     private fun getListOfNotes() {
         getListJob = viewModelScope.launch {
+            Log.d("seeeee", "getListOfNote: иду")
             (todoListRepository.getTodoList()).collect { uit ->
                 _listOfNotesFlow.update {
                     mutableListOf<TodoItem>().apply {

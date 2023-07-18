@@ -67,18 +67,21 @@ class TodoListRepositoryImpl @Inject constructor(
         }
     }
     private suspend fun updateDatabaseFromServer(request: TodoListResponseDto) {
-        val itemsFromServer = request.list.map {
-            mapDtoToTodoItem(it).toDbModel()
-        }
-        val itemsFromDatabase = dao.getTodoListAsList()
-        if (itemsFromDatabase.isNullOrEmpty()) {
-            itemsFromDatabase.map {
-                dao.insertTodoItem(it)
+        withContext(Dispatchers.IO) {
+            val itemsFromServer = request.list.map {
+                mapDtoToTodoItem(it).toDbModel()
             }
-        } else {
-            Log.d("DebagerBig", "updateDatabaseFromServer: ")
-            mergeData(itemsFromDatabase, itemsFromServer)
+            val itemsFromDatabase = dao.getTodoListAsList()
+            if (itemsFromDatabase.isNullOrEmpty()) {
+                itemsFromDatabase.map {
+                    dao.insertTodoItem(it)
+                }
+            } else {
+                Log.d("DebagerBig", "updateDatabaseFromServer: ")
+                mergeData(itemsFromDatabase, itemsFromServer)
+            }
         }
+
     }
     private suspend fun synchronizeRevisions() {
         withContext(Dispatchers.IO) {

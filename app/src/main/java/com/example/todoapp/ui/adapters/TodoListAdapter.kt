@@ -15,6 +15,7 @@ import com.example.todoapp.ui.rv.TodoItemViewHolder
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.textview.MaterialTextView
 import com.example.todoapp.databinding.ItemTodoBinding
+import com.example.todoapp.ui.fragments.MainFragment
 import java.util.*
 import javax.inject.Singleton
 
@@ -22,15 +23,15 @@ import javax.inject.Singleton
 class TodoListAdapter : ListAdapter<TodoItem, TodoItemViewHolder>(TodoItemDiffCallback()) {
 
     fun submit(list:  List<TodoItem>) {
-
         for( i in list){
             println(i)
         }
-        Log.d("DEBAG3", list.size.toString())
         submitList(list)
     }
 
     var onTodoItemClickListener: ((TodoItem) -> Unit)? = null
+
+    var onCheckBoxClickListener: ((TodoItem) -> Unit)? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoItemViewHolder {
         val binding =
             ItemTodoBinding.inflate(
@@ -72,7 +73,7 @@ class TodoListAdapter : ListAdapter<TodoItem, TodoItemViewHolder>(TodoItemDiffCa
                 }
             }
 
-            if (item.deadline != null){ // Дата дедлайна
+            if (item.deadline != null){
                 val calendar = Calendar.getInstance()
                 calendar.time = item.deadline!!
                 val day = calendar.get(Calendar.DAY_OF_MONTH)
@@ -86,31 +87,45 @@ class TodoListAdapter : ListAdapter<TodoItem, TodoItemViewHolder>(TodoItemDiffCa
             }
 
 
-            if (item.isCompleted){ // Состояние чекбокса
-                setTodoCompleted(checkboxDone, tvMsg, root.resources)
-
+            if (item.isCompleted){
+                setTodoCompleted(checkboxDone, tvMsg)
             }else{
-                setTodoNotCompleted(checkboxDone, item, tvMsg, root.resources)
+                setTodoNotCompleted(checkboxDone, item, tvMsg)
             }
 
-            container.setOnClickListener {  // Клик по итему
+            container.setOnClickListener {
                 onTodoItemClickListener?.invoke(item)
             }
 
-            /*checkboxDone.setOnClickListener { // Состояние чекбокса
+            checkboxDone.setOnClickListener {
+                onCheckBoxClickListener?.invoke(item)
+            }
+
+
+
+
+
+           /* checkboxDone.setOnClickListener {
                 checkboxDone.isErrorShown = false
                 if (checkboxDone.checkedState == MaterialCheckBox.STATE_CHECKED) {
-                    setTodoCompeted(checkboxDone, tvMsg, root.resources)
-                    MainFragment.countDone.value = MainFragment.countDone.value?.plus(1) // переделаю
+                    setTodoCompleted(checkboxDone, tvMsg)
+                    item.isCompleted=true
+                   // MainFragment.countDone.value = MainFragment.countDone.value?.plus(1) // переделаю
                 }else{
-                    MainFragment.countDone.value = MainFragment.countDone.value?.minus(1)
-                    setTodoNotCompleted(checkboxDone, item, tvMsg, root.resources)
+                   // MainFragment.countDone.value = MainFragment.countDone.value?.minus(1)
+                    setTodoNotCompleted(checkboxDone, item, tvMsg)
+                    item.isCompleted=false
                 }
             }*/
+
+
+
+
+
         }
     }
 
-    private fun setTodoCompleted(box: MaterialCheckBox, tv: MaterialTextView, resources: Resources){
+    private fun setTodoCompleted(box: MaterialCheckBox, tv: MaterialTextView){
         box.checkedState = MaterialCheckBox.STATE_CHECKED
 
 
@@ -120,7 +135,7 @@ class TodoListAdapter : ListAdapter<TodoItem, TodoItemViewHolder>(TodoItemDiffCa
         tv.paintFlags =  Paint.STRIKE_THRU_TEXT_FLAG
     }
 
-    private fun setTodoNotCompleted(box: MaterialCheckBox, item: TodoItem, tv: MaterialTextView, resources: Resources){
+    private fun setTodoNotCompleted(box: MaterialCheckBox, item: TodoItem, tv: MaterialTextView){
         box.checkedState = MaterialCheckBox.STATE_UNCHECKED
 
         box.isErrorShown = item.priority == ItemPriority.URGENT
