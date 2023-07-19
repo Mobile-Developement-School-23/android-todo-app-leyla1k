@@ -1,7 +1,12 @@
 package com.example.todoapp
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.work.Configuration
 import com.example.todoapp.di.ApplicationComponent
 import com.example.todoapp.di.DaggerApplicationComponent
 import com.example.todoapp.storage.localbase.MainDb
@@ -24,7 +29,7 @@ class TodoApplication: Application() {
     }).build()
 
     val applicationComponent: ApplicationComponent by lazy {
-        DaggerApplicationComponent.factory().create(//а тут супа пупа
+        DaggerApplicationComponent.factory().create(
             application = this,
             context = applicationContext,
             retrofit = retrofit)
@@ -40,10 +45,31 @@ class TodoApplication: Application() {
                 instance ?: TodoApplication().also { instance = it }
             }
     }
-    /////
+
     override fun onCreate() {
         super.onCreate()
+        createChannel()
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.getDefaultNightMode())
+
     }
+
+
+
+
+
+    private fun createChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel =
+                NotificationChannel(
+                    "SuperTodoApplicationChannelId",
+                    "SuperTodoApplication",
+                    NotificationManager.IMPORTANCE_HIGH
+                )
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
+    }
+
 
 }

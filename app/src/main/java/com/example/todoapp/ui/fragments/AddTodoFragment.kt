@@ -1,13 +1,16 @@
 package com.example.todoapp.ui.fragments
 
+import android.Manifest
 import android.app.DatePickerDialog
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,6 +30,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
@@ -44,8 +48,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import com.example.todoapp.ui.viewmodels.AddTodoViewModel
 import com.example.todoapp.TodoApplication
@@ -64,8 +70,6 @@ class AddTodoFragment : Fragment() {
         (requireActivity().application as TodoApplication).applicationComponent.viewModelFactory()
     }
 
-    private lateinit var _taskID: String
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         (requireActivity().application as TodoApplication)
@@ -82,6 +86,7 @@ class AddTodoFragment : Fragment() {
         val view = ComposeView(requireContext())
         view.apply {
             setContent {
+
                 var mainText = remember { mutableStateOf("") }
                 val checkedState = remember { mutableStateOf(false) }
                 Column(

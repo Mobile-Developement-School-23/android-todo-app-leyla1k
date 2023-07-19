@@ -1,14 +1,12 @@
 package com.example.todoapp.ui.fragments
 
-import android.app.AlarmManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.PopupMenu
 
@@ -19,11 +17,9 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.todoapp.AlarmReceiver
 import com.example.todoapp.ui.viewmodels.MainViewModel
 import com.example.todoapp.R
 import com.example.todoapp.TodoApplication
-import com.example.todoapp.TodoItem
 import com.google.android.material.transition.MaterialSharedAxis
 import com.tsuryo.swipeablerv.SwipeLeftRightCallback
 import com.example.todoapp.databinding.FragmentMainBinding
@@ -35,8 +31,8 @@ import com.example.todoapp.shared.Constants.THEME_DARK
 import com.example.todoapp.shared.Constants.THEME_LIGHT
 import com.example.todoapp.shared.Constants.THEME_UNDEFINED
 import com.example.todoapp.ui.adapters.TodoListAdapter
-import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import javax.inject.Inject
@@ -62,28 +58,6 @@ class MainFragment : Fragment() {
         (requireActivity().application as TodoApplication).applicationComponent.inject(this)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        val alarmManager = requireActivity().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-
-        val intent = Intent(requireActivity(), AlarmReceiver::class.java)
-
-        val pendingIntent = PendingIntent.getBroadcast(requireActivity(), 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        val calendar = Calendar.getInstance()
-        //val next=  calendar.get(Calendar.HOUR_OF_DAY)
-        calendar.timeInMillis = System.currentTimeMillis()
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 0)
-        calendar.set(Calendar.SECOND,  0)
-        // Starts the alarm manager
-        alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP,
-            calendar.timeInMillis,
-            AlarmManager.INTERVAL_DAY,
-            pendingIntent
-        )
-    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -94,31 +68,15 @@ class MainFragment : Fragment() {
         binding = FragmentMainBinding.inflate(inflater, container, false)
         initTheme()
         setupMenu()
-        /* binding.fabAddTodo.setOnClickListener {
-             findNavController().navigate(
-                 MainFragmentDirections.actionAddTodo()
-             )
-         }
-         binding.cardAddNew.setOnClickListener {
-             findNavController().navigate(
-                 com.example.todoapp.ui.MainFragmentDirections.actionAddTodo()
-             )
-         }*/
         binding.btnSettings.setOnClickListener {
             popupMenuSettings?.show()
         }
 
-
-
-
-        Log.d("SAVING", "SaveBtn:1 ")
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.listOfNotesFlow.flowWithLifecycle(
-
                 viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED
             ).collect { dataFromDB ->
                 todoListAdapter.submit(dataFromDB)
-                Log.d("DEBAG4", "data" + dataFromDB.size)
             }
         }
         setupRecyclerView()
@@ -155,7 +113,8 @@ class MainFragment : Fragment() {
         popupMenuSettings!!.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.undone -> {
-
+                // перепукать адаптер
+                    //todoListAdapter.showUndone()
                 }
                 R.id.dark_theme -> {
                     saveTheme(1)
@@ -230,43 +189,8 @@ class MainFragment : Fragment() {
               viewModel.changeDoneState(it)
 
         }
-
-
-
-
-
     }
 
 
-    /*    private fun sendNotification(result: TodoItem) {
-        if (result.deadline == null) return
-        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager?
-        val alarmIntent = Intent(requireContext(), AlarmReceiver::class.java).let { intent ->
-            intent.putExtra(AlarmReceiver.TITLE, result.text)
-            intent.putExtra(AlarmReceiver.IMPORTANCE, result.importance.toString())
-            PendingIntent.getBroadcast(requireContext(), result.id.toInt(), intent, PendingIntent.FLAG_IMMUTABLE)
-        }
-        val calendar = Calendar.getInstance().apply {
-            timeInMillis = result.deadline
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-        }
 
-        alarmManager?.setExact(
-            AlarmManager.RTC_WAKEUP,
-            calendar.timeInMillis,
-            alarmIntent
-        )
-    }
-
-    private fun deleteNotification(result: TodoItem) {
-        val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager?
-        val alarmIntent = Intent(requireContext(), AlarmReceiver::class.java)
-        val pendingIntent = PendingIntent
-            .getBroadcast(requireContext(), result.id.toInt(), alarmIntent, PendingIntent.FLAG_IMMUTABLE)
-        pendingIntent?.let {
-            alarmManager?.cancel(it)
-            it.cancel()
-        }
-    }*/
 }

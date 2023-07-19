@@ -1,6 +1,5 @@
 package com.example.todoapp.ui.viewmodels
 
-import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import androidx.work.PeriodicWorkRequestBuilder
@@ -11,7 +10,6 @@ import com.example.todoapp.shared.Constants
 import com.example.todoapp.storage.repository.TodoListRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -38,9 +36,13 @@ class MainViewModel @Inject constructor(
             refreshDataFromRepository()
             todoListRepository.createRevision()
 
+
+
+
         }
 
     }
+
 
     private val workRequest =
         PeriodicWorkRequestBuilder<SynchronizeWorker>(
@@ -48,6 +50,9 @@ class MainViewModel @Inject constructor(
             TimeUnit.HOURS
         )
             .build()
+
+
+
 
     private var _eventNetworkError = MutableLiveData(false)
     private var _isNetworkErrorShown = MutableLiveData(false)

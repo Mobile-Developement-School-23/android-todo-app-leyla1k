@@ -1,5 +1,8 @@
 package com.example.todoapp
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.util.Log
 import com.example.todoapp.storage.localbase.DbRevision
 import com.example.todoapp.storage.localbase.TodoDataItem
@@ -66,7 +69,13 @@ class TodoListRepositoryImpl @Inject constructor(
             dao.insertRevision(DbRevision(1, 0))
         }
     }
-    private suspend fun updateDatabaseFromServer(request: TodoListResponseDto) {
+    override fun getTodoListAsList(): List<TodoItem> {
+
+
+
+        return dao.getTodoListAsList().map { it.toTodoItem() }
+    }
+            private suspend fun updateDatabaseFromServer(request: TodoListResponseDto) {
         withContext(Dispatchers.IO) {
             val itemsFromServer = request.list.map {
                 mapDtoToTodoItem(it).toDbModel()

@@ -6,7 +6,6 @@ import com.example.todoapp.TodoItem
 fun TodoItem.toDbModel(): TodoDataItem {
     return TodoDataItem(
         id = this.id,
-        //id = UUID.fromString(this.id)
         msg = this.msg,
         priority = this.priority,
         deadline = this.deadline,

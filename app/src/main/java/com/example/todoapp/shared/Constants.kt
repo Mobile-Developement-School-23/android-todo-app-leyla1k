@@ -11,5 +11,7 @@ object Constants {
     const val THEME_DARK = 1
 
     const val SYNCHRONIZE_INTERVAL_HOURS : Long = 8
+
+    const val NOTIFICATION_INTERVAL_HOURS : Long = 24
     const val REVISION_ID = 1
 }

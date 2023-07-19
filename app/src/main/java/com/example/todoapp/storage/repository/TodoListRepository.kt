@@ -9,17 +9,15 @@ interface TodoListRepository {
     suspend fun createRevision()
      fun getTodoList(): Flow<List<TodoItem>>
 
-    // fun getTodoItem(id: String): TodoItem
+     fun getTodoListAsList(): List<TodoItem>
 
     suspend fun editTodoItem(item: TodoItem)
 
     suspend fun addTodoItem(item: TodoItem)
 
     suspend fun deleteTodoItem(item: TodoItem, stringId:String)
-/*    fun insertRevision()*/
     suspend fun deleteTodoItemWithoutPosition(item: TodoItem)
 
-    /*suspend fun updateTodoList()*/
     suspend fun deleteList()
     suspend fun updateTodoListFromInternet( revision: Int,
                                             body: TodoListRequestDto)
