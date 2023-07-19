@@ -61,7 +61,7 @@ class EditTodoFragment : Fragment() {
         setupListeners()
         return binding.root
     }
-    private fun init(){
+    private fun init(){//переправить
         viewLifecycleOwner.lifecycleScope.launch {
             Log.d("Edit item id", todoId)
             todoItem = viewModel.getTodoItem(id = todoId)

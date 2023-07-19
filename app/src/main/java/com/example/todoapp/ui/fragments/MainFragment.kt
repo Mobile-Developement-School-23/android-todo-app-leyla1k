@@ -109,7 +109,6 @@ class MainFragment : Fragment() {
     private fun setupMenu() {
         popupMenuSettings = PopupMenu(requireContext(), binding.btnSettings)
         popupMenuSettings!!.menuInflater.inflate(R.menu.menu_settings, popupMenuSettings!!.menu)
-        //  надо убрать наверное
         popupMenuSettings!!.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.undone -> {
